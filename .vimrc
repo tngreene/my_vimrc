@@ -22,6 +22,9 @@ filetype off
 " Activate syntax highlighting.
 syntax enable
 
+"Stop showing "Press ENTER or type command to continue"
+set cmdheight=2
+
 filetype plugin indent on
 
 :Helptags
