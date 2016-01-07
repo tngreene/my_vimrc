@@ -11,7 +11,13 @@
 " across (heterogeneous) systems easier.
 if has('win32') || has('win64')
   set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+  "To ensure NERDTree doesn't start in system32 or something
+  cd $HOME
 endif
+
+" Quick access to VIMRC
+" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
+let $MYVIMRC="$HOME/.vim/.vimrc"
 
 " Easy pasting to Windows and XWindows systems"
 set clipboard=unnamed
@@ -28,16 +34,24 @@ set cmdheight=2
 
 filetype plugin indent on
 
-:Helptags
+""""""""""""""""""""""
+"Set up omni-complete"
+""""""""""""""""""""""
+if has("autocmd") && exists("+omnifunc")
+	autocmd Filetype *
+		    \	if &omnifunc == "" |
+		    \		setlocal omnifunc=syntaxcomplete#Complete |
+		    \	endif
+endif 
 
 " 2.) Visual Effects
 " Set a nice theme.
-color slate
+colorscheme clarity
 
 " Column Settings 
 " Create a columns on [80]
 let &colorcolumn=80
-highlight ColorColumn term=reverse ctermbg=8 guibg=DarkGrey
+highlight ColorColumn ctermbg=8 guibg=DarkGrey
 
 " Tab setting
 " Always show the tab characters
@@ -58,7 +72,12 @@ if has("gui_running")
   set guioptions-=T
 endif
 
-" 3.) Keyboard changes
+" 3. Keyboard changes
+"
+"""""""""""""""""""""""""""""
+" 3a. Global, all the time  "
+"""""""""""""""""""""""""""""
+
 " Explicityly set the mapleader(s)
 let mapleader = "\\"
 let maplocalleader = "\\"
@@ -66,17 +85,25 @@ let maplocalleader = "\\"
 " Change backspace behavior
 set backspace=indent,eol,start
 
-" Quick access to VIMRC
-" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
-let $MYVIMRC="$HOME/.vim/.vimrc"
+"""""""""""""""""""""""""""""
+" 3c. Normal mode changes   "
+"""""""""""""""""""""""""""""
 nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 "Save and refresh the vimrc
 nnoremap <leader>sv :w<cr>:source $MYVIMRC<cr>
+
+nnoremap : ;
+nnoremap ; :
+""""""""""""""""""""""""""""
+" 3c. Insert mode changes  "
+""""""""""""""""""""""""""""
 
 " Quick esc using jk, an alternative to switching capslock
 inoremap jk <esc>
 inoremap kj <esc>
 
+" Ctrl_v in insert mode pastes, use Ctrl-q instead
+inoremap <C-v> <C-r>+
 "Press esc to automatically close a help window
 augroup quickhelpexit
 	au!
@@ -84,21 +111,24 @@ augroup quickhelpexit
 	autocmd BufLeave help nunmap <buffer> <esc>
 augroup END
 
+"Open a new line without entering insert mode
+nnoremap <A-o> o<esc>
+nnoremap <A-O> O<esc>
+
 " Disable the arrow keys so you can be a super professional vim user
 noremap <Left>  <NOP>
 noremap <Right> <NOP>
 noremap <Up>    <NOP>
 noremap <Down>  <NOP>
 
-"3a.) NERDTree
-noremap <leader>nn :NERDTreeToggle<cr>
-noremap <leader>nb :NERDTreeFromBookmark 
-noremap <leader>nf :NERDTreeFind<cr>
-
-	"3b.) Tagbar
-	noremap  <silent> <special> <F12> :TagbarToggle<RETURN> 
-	noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
+"3c.) Tagbar
+noremap  <silent> <special> <F12> :TagbarToggle<RETURN> 
+noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 
 " 4.) Plugin Settings
 	"4a.) NerdTree settings
 	let g:NERDTreeWinPos = "left"
+
+	noremap <leader>nn :NERDTreeToggle<cr>
+	noremap <leader>nb :NERDTreeFromBookmark 
+	noremap <leader>nf :NERDTreeFind<cr>
