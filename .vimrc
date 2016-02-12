@@ -10,7 +10,7 @@
 " On Windows, also use '.vim' instead of 'vimfiles'; this makes synchronization
 " across (heterogeneous) systems easier.
 if has('win32') || has('win64')
-	set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+	set runtimepath=$HOME/.vim,$HOME/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
 	"To ensure NERDTree doesn't start in system32 or something
 	cd $HOME
 
@@ -19,15 +19,14 @@ if has('win32') || has('win64')
 	let $MYVIMRC="$HOME/.vim/.vimrc"
 elseif has('unix')
 	set ffs=unix,dos,mac
-	set runtimepath=$HOME/shared/dot/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/shared/dot/.vim/after
+	set runtimepath=$HOME/shared/dot/.vim,$HOME/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/shared/dot/.vim/after
 
 	cd $HOME
 
 	" Quick access to VIMRC
 	" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
-	"let $MYVIMRC="$HOME/shared/dot/.vim/.vimrc"
+	let $MYVIMRC="$HOME/shared/dot/.vim/.vimrc"
 endif
-
 
 " Easy pasting to Windows and XWindows systems"
 set clipboard=unnamed
@@ -36,13 +35,13 @@ set clipboard=unnamed
 execute pathogen#infect()
 filetype off
 
-" Activate syntax highlighting.
-syntax on 
-
 "Stop showing "Press ENTER or type command to continue"
 set cmdheight=2
 
 filetype plugin indent on
+
+" Activate syntax highlighting.
+syntax on 
 
 " 2.) Visual Effects
 " Set a nice theme.
@@ -121,6 +120,17 @@ noremap <Right> <NOP>
 noremap <Up>    <NOP>
 noremap <Down>  <NOP>
 
+""""""""""""""""""""""""""""""""
+" General Tags Settings
+""""""""""""""""""""""""""""""""
+" configure tags - add additional tags here or comment out not-used ones
+set tags+=~/.vim/tags/cpp
+set tags+=~/.vim/tags/sfml
+set tags+=~/.vim/tags/box2d
+
+ " build tags of your own project with Ctrl-F12
+ map <C-F12> :!ctags -R --sort=yes --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
+
 "3c.) Tagbar
 noremap  <silent> <special> <F12> :TagbarToggle<RETURN> 
 noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
@@ -133,6 +143,18 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 	noremap <leader>nb :NERDTreeFromBookmark 
 	noremap <leader>nf :NERDTreeFind<cr>
 	
+" OmniCppComplete
+ let OmniCpp_NamespaceSearch = 1
+ let OmniCpp_GlobalScopeSearch = 1
+ let OmniCpp_ShowAccess = 1
+ let OmniCpp_ShowPrototypeInAbbr = 1 " show function parameters
+ let OmniCpp_MayCompleteDot = 1 " autocomplete after .
+ let OmniCpp_MayCompleteArrow = 1 " autocomplete after ->
+ let OmniCpp_MayCompleteScope = 1 " autocomplete after ::
+ let OmniCpp_DefaultNamespaces = ["std", "_GLIBCXX_STD"]
+ " automatically open and close the popup menu / preview window
+ au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
+ set completeopt=menuone,menu,longest,preview
 	"4b.) Vim JDE
 	let g:vjde_completion_key = "<c-space>"
 
