@@ -10,14 +10,24 @@
 " On Windows, also use '.vim' instead of 'vimfiles'; this makes synchronization
 " across (heterogeneous) systems easier.
 if has('win32') || has('win64')
-  set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
-  "To ensure NERDTree doesn't start in system32 or something
-  cd $HOME
+	set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+	"To ensure NERDTree doesn't start in system32 or something
+	cd $HOME
+
+	" Quick access to VIMRC
+	" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
+	let $MYVIMRC="$HOME/.vim/.vimrc"
+elseif has('unix')
+	set ffs=unix,dos,mac
+	set runtimepath=$HOME/shared/dot/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/shared/dot/.vim/after
+
+	cd $HOME
+
+	" Quick access to VIMRC
+	" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
+	"let $MYVIMRC="$HOME/shared/dot/.vim/.vimrc"
 endif
 
-" Quick access to VIMRC
-" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
-let $MYVIMRC="$HOME/.vim/.vimrc"
 
 " Easy pasting to Windows and XWindows systems"
 set clipboard=unnamed
@@ -27,26 +37,16 @@ execute pathogen#infect()
 filetype off
 
 " Activate syntax highlighting.
-syntax enable
+syntax on 
 
 "Stop showing "Press ENTER or type command to continue"
 set cmdheight=2
 
 filetype plugin indent on
 
-""""""""""""""""""""""
-"Set up omni-complete"
-""""""""""""""""""""""
-if has("autocmd") && exists("+omnifunc")
-	autocmd Filetype *
-		    \	if &omnifunc == "" |
-		    \		setlocal omnifunc=syntaxcomplete#Complete |
-		    \	endif
-endif 
-
 " 2.) Visual Effects
 " Set a nice theme.
-colorscheme clarity
+colorscheme molokai 
 
 " Column Settings 
 " Create a columns on [80]
@@ -132,3 +132,9 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 	noremap <leader>nn :NERDTreeToggle<cr>
 	noremap <leader>nb :NERDTreeFromBookmark 
 	noremap <leader>nf :NERDTreeFind<cr>
+	
+	"4b.) Vim JDE
+	let g:vjde_completion_key = "<c-space>"
+
+	"4c.) vim-markdown
+	let g:vim_markdown_folding_disabled = 1
