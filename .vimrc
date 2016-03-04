@@ -91,7 +91,7 @@ nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 "Save and refresh the vimrc
 nnoremap <leader>sv :w<cr>:source $MYVIMRC<cr>
 
-nnoremap : ;
+" nnoremap : ;
 nnoremap ; :
 """"""""""""""""""""""""""""
 " 3c. Insert mode changes  "
@@ -139,9 +139,13 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 	"4a.) NerdTree settings
 	let g:NERDTreeWinPos = "left"
 
-	noremap <leader>nn :NERDTreeToggle<cr>
-	noremap <leader>nb :NERDTreeFromBookmark 
-	noremap <leader>nf :NERDTreeFind<cr>
+	noremap <silent> <F2> :execute 'NERDTreeToggle ' . getcwd()<CR>
+	noremap <silent> <F3> :NERDTreeFind<CR>
+
+	let g:NERDTreeMapActivateNode="<F3>"
+	let g:NERDTreeMapPreview="<F4>"
+	let g:NERDTreeBookmarksFile="$HOME/.vim/plugin_dirs/NERDTree/.NERDTreeBookmarks"
+	let g:NERDTreeDirArrows=0
 	
 " OmniCppComplete
  let OmniCpp_NamespaceSearch = 1
