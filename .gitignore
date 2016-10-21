@@ -1,3 +1,4 @@
 *.swp
 bundle/colorsamplerpack/*
 tags/cpp_src
+*.out

@@ -3,8 +3,12 @@
 " 2.) Visual Effects
 " 3.) Keyboard Re-mappings
 " 4.) Plugin Settings
-" 	a. NERDTree
-" 	b. NeoComplete
+"	a. MRU
+"	b. NERDTree
+"	c. NeoComplete
+"	d. YouCompleteMe
+" 5.) Functions
+
 " 1.) System setup
 " On Windows, also use '.vim' instead of 'vimfiles'; this makes synchronization
 " across (heterogeneous) systems easier.
@@ -12,20 +16,21 @@ if has('win32') || has('win64')
 	set runtimepath=$HOME/.vim,$HOME/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
 	"To ensure NERDTree doesn't start in system32 or something
 	cd $HOME
-
+	"let $MYVIMFOLDER="$HOME/.vim"
 	" Quick access to VIMRC
 	" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
 	let $MYVIMRC="$HOME/.vim/.vimrc"
+	" source $VIMRUNTIME/mswin.vim
 elseif has('unix')
 	set ffs=unix,dos,mac
-	set runtimepath=$HOME/shared/.vim,$HOME/shared/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/shared/.vim/after
+	set runtimepath=$HOME/share/.vim,$HOME/share/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/share/.vim/after
 
 	cd $HOME
+	"let $MYVIMFOLDER="$HOME/shared/.vim"
 
 	" Quick access to VIMRC
 	" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
 	let $MYVIMRC="$HOME/shared/.vim/.vimrc"
-	source $VIMRUNTIME/mswin.vim
 endif
 
 " Easy pasting to Windows and XWindows systems"
@@ -40,6 +45,8 @@ set cmdheight=2
 
 filetype plugin indent on
 
+set tabpagemax=100
+set nrformats=alpha,octal,hex
 " Activate syntax highlighting.
 syntax on 
 
@@ -91,10 +98,22 @@ inoremap <C-J> <Esc>:m .+1<CR>==gi
 inoremap <C-K> <Esc>:m .-2<CR>==gi
 vnoremap <C-J> :m '>+1<CR>gv=gv
 vnoremap <C-K> :m '<-2<CR>gv=gv
+
+" Switch ; and :
+nnoremap : ;
+nnoremap ; :
+
+vnoremap : ;
+vnoremap ; :
+
+"Switch between tabs
+nnoremap <silent> <C-Tab> :tabnext<CR>
+nnoremap <silent> <C-S-Tab> :tabprev<CR>
 """""""""""""""""""""""""""""
 " 3b. C/C++ mappings        "
 """""""""""""""""""""""""""""
 nnoremap <F4> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+
 """""""""""""""""""""""""""""
 " 3c. Normal mode changes   "
 """""""""""""""""""""""""""""
@@ -102,8 +121,9 @@ nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 "Save and refresh the vimrc
 nnoremap <leader>sv :w<cr>:source $MYVIMRC<cr>
 nnoremap <special><C-W><C-Q> <C-W><C-C>
-nnoremap : ;
-nnoremap ; :
+
+nnoremap dd "_dd
+
 """"""""""""""""""""""""""""
 " 3c. Insert mode changes  "
 """"""""""""""""""""""""""""
@@ -151,6 +171,10 @@ noremap  <silent> <special> <F12> :TagbarToggle<RETURN>
 noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 
 " 4.) Plugin Settings
+	"4a.) MRU Settings
+	let MRU_File = "C:\\Users\\ted\\.vim\\plugin_dirs\\MRU\\_vim_mru_files"
+	"/.vim/plugin_dirs/MRU/_vim_mru_files"
+
 	"4a.) NerdTree settings
 	noremap <silent> <F2> :execute 'NERDTreeToggle ' . getcwd()<CR>
 	noremap <silent> <F3> :NERDTreeFind<CR>
@@ -158,11 +182,14 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 	let g:NERDTreeWinPos = "left"
 	let g:NERDTreeMapActivateNode="<F3>"
 	let g:NERDTreeMapPreview="<F4>"
-	let g:NERDTreeBookmarksFile="$HOME/.vim/plugin_dirs/NERDTree/.NERDTreeBookmarks"
+	"let g:NERDTreeBookmarksFile="$MYVIMFOLDER/plugin_dirs/NERDTree/.NERDTreeBookmarks"
 	let g:NERDTreeDirArrows=0
+	let g:NERDTreeMouseMode=2
 	let g:NERDTreeShowHidden=1
 
 	"4b.) NeoComplete settings
+	"let g:neocomplete#data_directory = "$MYVIMFOLDER/plugin_dirs/neocomplete"
+
 	" Disable AutoComplPop.
 	let g:acp_enableAtStartup = 0
 	" Use neocomplete.
@@ -237,8 +264,15 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
  " automatically open and close the popup menu / preview window
  au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
  set completeopt=menuone,menu,longest,preview
+ 
 	"4b.) Vim JDE
 	let g:vjde_completion_key = "<c-space>"
 
 	"4c.) vim-markdown
 	let g:vim_markdown_folding_disabled = 1
+
+	"4d.) YouCompleteME
+	"if(!(has('win32') || has('win64')))
+	  
+	"endif
+" 5.) Functions
