@@ -2,3 +2,5 @@
 bundle/colorsamplerpack/*
 tags/cpp_src
 *.out
+*_vim_mru_files
+.netrwhist

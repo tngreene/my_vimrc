@@ -45,11 +45,18 @@ set cmdheight=2
 
 filetype plugin indent on
 
+set nobackup
+set nowritebackup
+
 set tabpagemax=100
 set nrformats=alpha,octal,hex
 " Activate syntax highlighting.
 syntax on 
 
+"Allows one to use dir instead of ls on windows
+if has('win32') || has('win64')
+	command! -bar Dir !dir
+endif
 " 2.) Visual Effects
 " Set a nice theme.
 colorscheme molokai 
@@ -109,9 +116,17 @@ vnoremap ; :
 "Switch between tabs
 nnoremap <silent> <C-Tab> :tabnext<CR>
 nnoremap <silent> <C-S-Tab> :tabprev<CR>
+
+"Replace word under cursor
+nnoremap <leader>rw :.,$s/<C-R><C-W>//gc<Left><Left><Left>
+
+"Replace WORD under cursor
+nnoremap <leader>rW :.,$s/<C-R><C-A>//gc<Left><Left><Left>
 """""""""""""""""""""""""""""
 " 3b. C/C++ mappings        "
 """""""""""""""""""""""""""""
+
+"Swap between .cpp and .h
 nnoremap <F4> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
 
 """""""""""""""""""""""""""""
