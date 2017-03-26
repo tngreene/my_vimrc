@@ -1,5 +1,8 @@
 " TOC
 " 1.) System Setup
+"	a. OS
+"	b. Gobal Settings
+"	c. vimdiff Settings
 " 2.) Visual Effects
 " 3.) Keyboard Re-mappings
 " 4.) Plugin Settings
@@ -15,11 +18,11 @@
 if has('win32') || has('win64')
 	set runtimepath=$HOME/.vim,$HOME/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
 	"To ensure NERDTree doesn't start in system32 or something
-	cd $HOME
-	"let $MYVIMFOLDER="$HOME/.vim"
+	"cd $HOME
+	let s:MYVIMFOLDER=$HOME . "/.vim"
 	" Quick access to VIMRC
 	" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
-	let $MYVIMRC="$HOME/.vim/.vimrc"
+	let $MYVIMRC=s:MYVIMFOLDER . "/.vimrc"
 	" source $VIMRUNTIME/mswin.vim
 elseif has('unix')
 	set ffs=unix,dos,mac
@@ -27,7 +30,7 @@ elseif has('unix')
 
 	cd $HOME
 	"let $MYVIMFOLDER="$HOME/shared/.vim"
-
+	
 	" Quick access to VIMRC
 	" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
 	let $MYVIMRC="$HOME/shared/.vim/.vimrc"
@@ -45,8 +48,9 @@ set cmdheight=2
 
 filetype plugin indent on
 
-set nobackup
-set nowritebackup
+let &backupdir=s:MYVIMFOLDER . '/.backup//'
+let &directory=s:MYVIMFOLDER . '/.swap//'
+let &undodir  =s:MYVIMFOLDER . '/.undo//'
 
 set tabpagemax=100
 set nrformats=alpha,octal,hex
@@ -57,6 +61,10 @@ syntax on
 if has('win32') || has('win64')
 	command! -bar Dir !dir
 endif
+
+" 1.c vimdiff Settings
+"
+set diffopt=filler,vertical
 " 2.) Visual Effects
 " Set a nice theme.
 colorscheme molokai 
