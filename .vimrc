@@ -8,6 +8,8 @@
 " 4.) Plugin Settings
 "	a. MRU
 "	b. NERDTree
+	"	- Main Settings
+	"	- git-plugin
 "	c. NeoComplete
 "	d. YouCompleteMe
 " 5.) Functions
@@ -48,6 +50,7 @@ set cmdheight=2
 
 filetype plugin indent on
 
+set encoding=utf-8
 let &backupdir=s:MYVIMFOLDER . '/.backup//'
 let &directory=s:MYVIMFOLDER . '/.swap//'
 let &undodir  =s:MYVIMFOLDER . '/.undo//'
@@ -195,8 +198,7 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 
 " 4.) Plugin Settings
 	"4a.) MRU Settings
-	let MRU_File = "C:\\Users\\ted\\.vim\\plugin_dirs\\MRU\\_vim_mru_files"
-	"/.vim/plugin_dirs/MRU/_vim_mru_files"
+	let MRU_File = s:MYVIMFOLDER . "/plugin_dirs/MRU/_vim_mru_files"
 
 	"4a.) NerdTree settings
 	noremap <silent> <F2> :execute 'NERDTreeToggle ' . getcwd()<CR>
@@ -205,13 +207,27 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 	let g:NERDTreeWinPos = "left"
 	let g:NERDTreeMapActivateNode="<F3>"
 	let g:NERDTreeMapPreview="<F4>"
-	"let g:NERDTreeBookmarksFile="$MYVIMFOLDER/plugin_dirs/NERDTree/.NERDTreeBookmarks"
+	let g:NERDTreeBookmarksFile=s:MYVIMFOLDER . "/plugin_dirs/NERDTree/.NERDTreeBookmarks"
 	let g:NERDTreeDirArrows=0
 	let g:NERDTreeMouseMode=2
 	let g:NERDTreeShowHidden=1
 
+	"NERDTree git plugin
+	let g:NERDTreeIndicatorMapCustom = {
+		\ "Modified"  : "✹",
+		\ "Staged"    : "✚",
+		\ "Untracked" : "✭",
+		\ "Renamed"   : "➜",
+		\ "Unmerged"  : "═",
+		\ "Deleted"   : "✖",
+		\ "Dirty"     : "✗",
+		\ "Clean"     : "✔︎",
+		\ 'Ignored'   : '☒',
+		\ "Unknown"   : "?"
+		\ }
+
 	"4b.) NeoComplete settings
-	"let g:neocomplete#data_directory = "$MYVIMFOLDER/plugin_dirs/neocomplete"
+	let g:neocomplete#data_directory = s:MYVIMFOLDER . "/plugin_dirs/neocomplete"
 
 	" Disable AutoComplPop.
 	let g:acp_enableAtStartup = 0
