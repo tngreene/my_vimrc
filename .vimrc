@@ -1,20 +1,25 @@
 " TOC
 " 1.) System Setup
-"	a. OS
+"	a. OS Settings
 "	b. Gobal Settings
-"	c. vimdiff Settings
+"	c. File Types
+"	d. vimdiff Settings
 " 2.) Visual Effects
 " 3.) Keyboard Re-mappings
 " 4.) Plugin Settings
-"	a. MRU
-"	b. NERDTree
+	"a. ALE
+"	a. EasyAlign
+"	b. MRU
+"	c. NERDTree
 	"	- Main Settings
 	"	- git-plugin
+	"- syntastic
 "	c. NeoComplete
-"	d. YouCompleteMe
+"	e. YouCompleteMe
 " 5.) Functions
 
 " 1.) System setup
+"	a. OS Settings
 " On Windows, also use '.vim' instead of 'vimfiles'; this makes synchronization
 " across (heterogeneous) systems easier.
 if has('win32') || has('win64')
@@ -42,7 +47,32 @@ endif
 set clipboard=unnamed
 
 " Setup pathogen"
-execute pathogen#infect()
+"execute pathogen#infect()
+
+call plug#begin('~/.vim/bundle')
+
+Plug 'chrisbra/csv.vim'
+Plug 'spolu/dwm.vim'
+Plug 'yegappan/mru'
+Plug 'shougo/neocomplete.vim'
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'w0rp/ale'
+"Plug 'https://github.com/vim-syntastic/syntastic'
+Plug 'majutsushi/tagbar'
+Plug 'tyru/transbuffer.vim'
+Plug 'bling/vim-airline'
+Plug 'junegunn/vim-easy-align'
+Plug 'elzr/vim-json'
+Plug 'plasticboy/vim-markdown'
+Plug 'adelarsq/vim-matchit'
+Plug 'tngreene/vim-obj8'
+Plug 'tpope/vim-surround'
+Plug 'kshenoy/vim-signature'
+Plug 'mhinz/vim-startify'
+Plug 'triglav/vim-visual-increment'
+
+call plug#end()
 filetype off
 
 "Stop showing "Press ENTER or type command to continue"
@@ -64,6 +94,8 @@ syntax on
 if has('win32') || has('win64')
 	command! -bar Dir !dir
 endif
+
+" 1.c File Type Settings
 
 " 1.c vimdiff Settings
 "
@@ -133,6 +165,13 @@ nnoremap <leader>rw :.,$s/<C-R><C-W>//gc<Left><Left><Left>
 
 "Replace WORD under cursor
 nnoremap <leader>rW :.,$s/<C-R><C-A>//gc<Left><Left><Left>
+
+"Swap CTRL-I/O, so older is the leftward key, and newwer is on the rightward key
+nnoremap <C-I> <C-O>
+nnoremap <C-O> <C-I>
+
+"Copy all
+nnoremap <leader>all :%y<CR>
 """""""""""""""""""""""""""""
 " 3b. C/C++ mappings        "
 """""""""""""""""""""""""""""
@@ -197,9 +236,17 @@ noremap  <silent> <special> <F12> :TagbarToggle<RETURN>
 noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 
 " 4.) Plugin Settings
+	"ALE
+	let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '⬥ ok']
+	"4a.) EasyAlign
+	" Start interactive EasyAlign in visual mode (e.g. vipga)
+	xmap ga <Plug>(EasyAlign)
+	" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+	nmap ga <Plug>(EasyAlign)
+
 	"4a.) MRU Settings
 	let MRU_File = s:MYVIMFOLDER . "/plugin_dirs/MRU/_vim_mru_files"
-
+	command! Mru MRU
 	"4a.) NerdTree settings
 	noremap <silent> <F2> :execute 'NERDTreeToggle ' . getcwd()<CR>
 	noremap <silent> <F3> :NERDTreeFind<CR>
@@ -226,13 +273,23 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 		\ "Unknown"   : "?"
 		\ }
 
+	"4.) syntastic
+    set statusline+=%#warningmsg#
+    set statusline+=%{SyntasticStatuslineFlag()}
+    set statusline+=%*
+
+    let g:syntastic_always_populate_loc_list = 1
+    let g:syntastic_auto_loc_list = 1
+    let g:syntastic_check_on_open = 1
+    let g:syntastic_check_on_wq = 0
+
 	"4b.) NeoComplete settings
 	let g:neocomplete#data_directory = s:MYVIMFOLDER . "/plugin_dirs/neocomplete"
 
 	" Disable AutoComplPop.
 	let g:acp_enableAtStartup = 0
 	" Use neocomplete.
-	let g:neocomplete#enable_at_startup = 1
+	let g:neocomplete#enable_at_startup = 0
 	" Use smartcase.
 	let g:neocomplete#enable_smart_case = 1
 	" Set minimum syntax keyword length.
