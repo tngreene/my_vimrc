@@ -5,3 +5,5 @@ tags/cpp_src
 *_vim_mru_files
 .netrwhist
 .swap/*
+plugin_dirs/gutentags/cache/*
+plugin_dirs/NERDTree/.NERDTreeBookmarks

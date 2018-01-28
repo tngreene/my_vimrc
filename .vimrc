@@ -1,25 +1,31 @@
-" TOC
-" 1.) System Setup
-"	a. OS Settings
-"	b. Gobal Settings
-"	c. File Types
-"	d. vimdiff Settings
-" 2.) Visual Effects
-" 3.) Keyboard Re-mappings
-" 4.) Plugin Settings
-	"a. ALE
-"	a. EasyAlign
-"	b. MRU
-"	c. NERDTree
-	"	- Main Settings
-	"	- git-plugin
-	"- syntastic
-"	c. NeoComplete
-"	e. YouCompleteMe
-" 5.) Functions
+﻿" TOC
+" - System Setup
+"	* OS Settings
+"	* Gobal Settings
+"	* File Types
+"	* vimdiff Settings
+" - Visual Effects
+" - Keyboard Re-mappings
+" - Plugin Settings
+"	* ALE
+"	* EasyAlign
+"	* EasyMotion
+"	* MRU
+"	* NERDTree
+"		> Main Settings
+"		> git-plugin
+"	* python-mode
+"	* rust-vim
+"	* spellrotate
+"	* startify
+"	* mucomplete
+"	* YouCompleteMe
+"	* vim-json
+"	* vim-opengrok
+" - Functions
 
-" 1.) System setup
-"	a. OS Settings
+" - System setup
+"	* OS Settings
 " On Windows, also use '.vim' instead of 'vimfiles'; this makes synchronization
 " across (heterogeneous) systems easier.
 if has('win32') || has('win64')
@@ -36,7 +42,7 @@ elseif has('unix')
 	set runtimepath=$HOME/share/.vim,$HOME/share/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/share/.vim/after
 
 	cd $HOME
-	"let $MYVIMFOLDER="$HOME/shared/.vim"
+	let s:MYVIMFOLDER="$HOME/shared/.vim"
 	
 	" Quick access to VIMRC
 	" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
@@ -52,39 +58,59 @@ set clipboard=unnamed
 call plug#begin('~/.vim/bundle')
 
 Plug 'chrisbra/csv.vim'
+Plug 'easymotion/vim-easymotion'
 Plug 'spolu/dwm.vim'
 Plug 'yegappan/mru'
-Plug 'shougo/neocomplete.vim'
+"Plug 'shougo/neocomplete.vim'
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'w0rp/ale'
-"Plug 'https://github.com/vim-syntastic/syntastic'
 Plug 'majutsushi/tagbar'
 Plug 'tyru/transbuffer.vim'
-Plug 'bling/vim-airline'
-Plug 'junegunn/vim-easy-align'
-Plug 'elzr/vim-json'
-Plug 'plasticboy/vim-markdown'
+" Plug 'beloglazov/vim-online-thesaurus'
 Plug 'adelarsq/vim-matchit'
-Plug 'tngreene/vim-obj8'
-Plug 'tpope/vim-surround'
+Plug 'asenac/vim-opengrok'
+Plug 'bling/vim-airline'
+Plug 'davidhalter/jedi-vim'
+Plug 'elzr/vim-json'
+Plug 'johngrib/vim-game-code-break'
+Plug 'junegunn/vim-easy-align'
 Plug 'kshenoy/vim-signature'
+Plug 'lifepillar/vim-mucomplete'
+Plug 'ludovicchabant/vim-gutentags'
 Plug 'mhinz/vim-startify'
+Plug 'othree/html5.vim'
+Plug 'plasticboy/vim-markdown'
+Plug 'racer-rust/vim-racer'
+Plug 'rhysd/vim-grammarous'
+Plug 'rust-lang/rust.vim'
+Plug 'tngreene/vim-obj8'
+Plug 'tngreene/vim-quickhelp'
+Plug 'tpope/vim-abolish'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
 Plug 'triglav/vim-visual-increment'
+Plug 'tweekmonster/spellrotate.vim'
 
 call plug#end()
 filetype off
+
+"Set commandline history length
+set history=700
 
 "Stop showing "Press ENTER or type command to continue"
 set cmdheight=2
 
 filetype plugin indent on
 
+set fileformat=unix
+set fileformats=unix,dos
 set encoding=utf-8
 let &backupdir=s:MYVIMFOLDER . '/.backup//'
 let &directory=s:MYVIMFOLDER . '/.swap//'
 let &undodir  =s:MYVIMFOLDER . '/.undo//'
 
+set cm=blowfish2
 set tabpagemax=100
 set nrformats=alpha,octal,hex
 " Activate syntax highlighting.
@@ -95,6 +121,7 @@ if has('win32') || has('win64')
 	command! -bar Dir !dir
 endif
 
+command! Q qall
 " 1.c File Type Settings
 
 " 1.c vimdiff Settings
@@ -128,18 +155,25 @@ if has("gui_running")
   set guioptions-=T
 endif
 
+" Fold settings
+set foldmethod=marker
+
 " 3. Keyboard changes
 "
 """""""""""""""""""""""""""""
 " 3a. Global, all the time  "
 """""""""""""""""""""""""""""
 
-" Explicityly set the mapleader(s)
+" Explicitly set the mapleader(s)
 let mapleader = "\\"
 let maplocalleader = "\\"
 
 " Change backspace behavior
 set backspace=indent,eol,start
+
+" Disable going into Ex mode
+nnoremap Q <nop>
+nnoremap <c-z> <nop>
 
 " Move lines up and down
 nnoremap <C-J> :m .+1<CR>==
@@ -166,12 +200,68 @@ nnoremap <leader>rw :.,$s/<C-R><C-W>//gc<Left><Left><Left>
 "Replace WORD under cursor
 nnoremap <leader>rW :.,$s/<C-R><C-A>//gc<Left><Left><Left>
 
-"Swap CTRL-I/O, so older is the leftward key, and newwer is on the rightward key
+" Thanks bryankennedy's vimrc!
+" https://github.com/bryankennedy/vimrc/blob/master/vimrc
+" Escape special characters in a string for exact matching.
+" This is useful to copying strings from the file to the search tool
+" Based on this - http://peterodding.com/code/vim/profile/autoload/xolox/escape.vim
+function! EscapeString (string)
+  let string=a:string
+  " Escape regex characters
+  let string = escape(string, '^$.*\/~[]')
+  " Escape the line endings
+  let string = substitute(string, '\n', '\\n', 'g')
+  return string
+endfunction
+
+" Get the current visual block for search and replaces
+" This function passed the visual block through a string escape function
+" Based on this - http://stackoverflow.com/questions/676600/vim-replace-selected-text/677918#677918
+function! GetVisual() range
+  " Save the current register and clipboard
+  let reg_save = getreg('"')
+  let regtype_save = getregtype('"')
+  let cb_save = &clipboard
+  set clipboard&
+
+  " Put the current visual selection in the " register
+  normal! ""gvy
+  let selection = getreg('"')
+
+  " Put the saved registers and clipboards back
+  call setreg('"', reg_save, regtype_save)
+  let &clipboard = cb_save
+
+  "Escape any special characters in the selection
+  let escaped_selection = EscapeString(selection)
+
+  return escaped_selection
+endfunction
+
+" Start the find and replace command across the entire file
+vnoremap <leader>rw <Esc>:.,$s/<c-r>=GetVisual()<cr>/
+
+"Swap CTRL-I/O, so older is the leftward key, and newer is on the rightward key
 nnoremap <C-I> <C-O>
 nnoremap <C-O> <C-I>
 
 "Copy all
 nnoremap <leader>all :%y<CR>
+
+"Thanks drchip! http://www.drchip.org/astronaut/vim/index.html#MATH
+"Insert Date&time mappings
+inoremap <Leader>ymd   <C-R>=strftime("%y%m%d")<CR>
+inoremap <Leader>mdy   <C-R>=strftime("%m/%d/%y")<CR>
+inoremap <Leader>ndy   <C-R>=strftime("%b %d, %Y")<CR>
+inoremap <Leader>hms   <C-R>=strftime("%T")<CR>
+inoremap <Leader>ynd   <C-R>=strftime("%Y %b %d")<CR>
+com! YMD :norm! i<C-R>=strftime("%y%m%d")<CR>
+com! MDY :norm! i<C-R>=strftime("%m/%d/%y")<CR>
+com! NDY :norm! i<C-R>=strftime("%b %d, %Y")<CR>
+com! HMS :norm! i<C-R>=strftime("%T")<CR>
+
+"Split current line based on character under cursor
+"nnoremap <A-J> :exe ":.s/" . getline(".")[col(".")-1] . "/" . getline(".")[col(".")-1] . "\r/cg"<CR>
 """""""""""""""""""""""""""""
 " 3b. C/C++ mappings        "
 """""""""""""""""""""""""""""
@@ -223,10 +313,7 @@ noremap <Down>  <NOP>
 " General Tags Settings
 """"""""""""""""""""""""""""""""
 " configure tags - add additional tags here or comment out not-used ones
-" set tags+=~/.vim/tags/cpp
-" set tags+=~/.vim/tags/sfml
-" set tags+=~/.vim/tags/box2d
-" set tags+=~/.vim/tags/xptools
+set tags+=~/.vim/tags/*
 " build tags of your own project with Ctrl-F12
 " map <C-F12> :!ctags -R --sort=yes --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
 
@@ -237,7 +324,17 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 
 " 4.) Plugin Settings
 	"ALE
+	let g:ale_enable = 1
 	let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '⬥ ok']
+	let g:ale_javascript_eslint_use_global = 1
+	let g:ale_linters = {
+						\'python':['pylint'],
+						\'rust':['rustc']
+						\}
+
+	" Enable completion where available.
+	let g:ale_completion_enabled = 0
+
 	"4a.) EasyAlign
 	" Start interactive EasyAlign in visual mode (e.g. vipga)
 	xmap ga <Plug>(EasyAlign)
@@ -245,8 +342,10 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 	nmap ga <Plug>(EasyAlign)
 
 	"4a.) MRU Settings
-	let MRU_File = s:MYVIMFOLDER . "/plugin_dirs/MRU/_vim_mru_files"
 	command! Mru MRU
+	let MRU_File = s:MYVIMFOLDER . "/plugin_dirs/MRU/_vim_mru_files"
+	let MRU_Max_Entries = 200
+
 	"4a.) NerdTree settings
 	noremap <silent> <F2> :execute 'NERDTreeToggle ' . getcwd()<CR>
 	noremap <silent> <F3> :NERDTreeFind<CR>
@@ -273,102 +372,77 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 		\ "Unknown"   : "?"
 		\ }
 
-	"4.) syntastic
-    set statusline+=%#warningmsg#
-    set statusline+=%{SyntasticStatuslineFlag()}
-    set statusline+=%*
+	"racer-rust/vim-racer
 
-    let g:syntastic_always_populate_loc_list = 1
-    let g:syntastic_auto_loc_list = 1
-    let g:syntastic_check_on_open = 1
-    let g:syntastic_check_on_wq = 0
+	"rust-vim
+	let g:rustc_path = $HOME.".cargo/bin/rustc"
+	let g:rustc_makeprg_no_percent = 1
+	let g:rust_conceal = 1
+	let g:rust_conceal_mod_path = 0
+	let g:rust_fold = 1
+	let g:ftplugin_rust_source_path = $RUST_SRC_PATH
 
-	"4b.) NeoComplete settings
-	let g:neocomplete#data_directory = s:MYVIMFOLDER . "/plugin_dirs/neocomplete"
+	"let g:rustfmt_autosave = 1
 
-	" Disable AutoComplPop.
-	let g:acp_enableAtStartup = 0
-	" Use neocomplete.
-	let g:neocomplete#enable_at_startup = 0
-	" Use smartcase.
-	let g:neocomplete#enable_smart_case = 1
-	" Set minimum syntax keyword length.
-	let g:neocomplete#sources#syntax#min_keyword_length = 3
-	let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+	"*startify
+    let g:startify_disable_at_vimenter = 1
 
-	" Define dictionary.
-	let g:neocomplete#sources#dictionary#dictionaries = {
-		\ 'default' : '',
-		\ 'vimshell' : $HOME.'/.vimshell_hist',
-		\ 'scheme' : $HOME.'/.gosh_completions'
-			\ }
-
-	" Define keyword.
-	if !exists('g:neocomplete#keyword_patterns')
-		let g:neocomplete#keyword_patterns = {}
-	endif
-	let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-
-	" Plugin key-mappings.
-	inoremap <expr><C-g>     neocomplete#undo_completion()
-	inoremap <expr><C-l>     neocomplete#complete_common_string()
-
-	" Recommended key-mappings.
-	" <CR>: close popup and save indent.
-	inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-	function! s:my_cr_function()
-	  "return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
-	  " For no inserting <CR> key.
-	  return pumvisible() ? "\<C-y>" : "\<CR>"
-	endfunction
-	" <TAB>: completion.
-	inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-	" <C-h>, <BS>: close popup and delete backword char.
-	"inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-	inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-	" Close popup by <Space>.
-	"inoremap <expr><Space> pumvisible() ? "\<C-y>" : "\<Space>"
-
-	" AutoComplPop like behavior.
-	"let g:neocomplete#enable_auto_select = 1
-
-	" Shell like behavior(not recommended).
-	"set completeopt+=longest
-	"let g:neocomplete#enable_auto_select = 1
-	"let g:neocomplete#disable_auto_complete = 1
-	"inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
-
-	" Enable omni completion.
-	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-	" Enable heavy omni completion.
-	if !exists('g:neocomplete#sources#omni#input_patterns')
-	  let g:neocomplete#sources#omni#input_patterns = {}
-	endif
-	"let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-	let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
-	let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
-
-	" For perlomni.vim setting.
-	" https://github.com/c9s/perlomni.vim
-	"let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
-
+	"*spellrotate
+	nmap <silent> zn <Plug>(SpellRotateForward)
+	nmap <silent> zp <Plug>(SpellRotateBackward)
+	vmap <silent> zn <Plug>(SpellRotateForwardV)
+	vmap <silent> zp <Plug>(SpellRotateBackwardV)
  " automatically open and close the popup menu / preview window
- au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
- set completeopt=menuone,menu,longest,preview
+ "au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
+ "set completeopt=menuone,menu,longest,preview
  
+	 "gutentags"
+	 let g:gutentags_cache_dir = s:MYVIMFOLDER . "/plugin_dirs/gutentags/cache"
+	 let g:gutentags_define_advanced_commands = 1
+	 let g:gutentags_enable = 1
+
 	"4b.) Vim JDE
 	let g:vjde_completion_key = "<c-space>"
 
 	"4c.) vim-markdown
 	let g:vim_markdown_folding_disabled = 1
 
-	"4d.) YouCompleteME
-	"if(!(has('win32') || has('win64')))
-	  
-	"endif
+	"vim-json
+	let g:vim_json_syntax_conceal = 0
+
+	
+	"vim-mucomplete
+	set completeopt+=menuone
+
+	"For automatic completion, you also need to put these in your vimrc:
+	inoremap <expr> <c-e> mucomplete#popup_exit("\<c-e>")
+	inoremap <expr> <c-y> mucomplete#popup_exit("\<c-y>")
+	inoremap <expr>  <cr> mucomplete#popup_exit("\<cr>")
+
+	"and at least one of the following (choose the combination that best fits your taste):
+	"set completeopt+=noselect
+	set completeopt+=noinsert
+
+	"Other recommended settings:
+
+	set shortmess+=c   " Shut off completion messages
+	set belloff+=ctrlg " If Vim beeps during completion
+
+	"No other configuration is needed. Just start pressing <tab> or <s-tab> to complete a word. If you want to enable automatic completion at startup, put
+	let g:mucomplete#enable_auto_at_startup = 1
+	let g:mucomplete#no_mappings = 1
+	"let g:mucomplete#chains = 0
+	"vim-jedi"
+	let g:jedi#auto_vim_configuration = 0
+	let g:jedi#auto_initialization = 1
+	
+	"vim-opengrok"
+	let g:opengrok_jar   = $OPENGROK_HOME . '/lib/opengrok.jar'
+	"let g:opengrok_ctags = 'C:\Users\Ted\Desktop\Utilities\Programming\ctags\ctags.exe'
+	let g:opengrok_config_file = '/var/opengrok/etc/configuration.xml'
+
+	"vim-markdown"
+	autocmd! FileType Markdown setlocal spell
+	autocmd! FileType Markdown setlocal expandtab
+
 " 5.) Functions
