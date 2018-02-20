@@ -1,4 +1,4 @@
-﻿" TOC
+" TOC
 " - System Setup
 "	* OS Settings
 "	* Gobal Settings
@@ -14,12 +14,10 @@
 "	* NERDTree
 "		> Main Settings
 "		> git-plugin
-"	* python-mode
 "	* rust-vim
 "	* spellrotate
 "	* startify
 "	* mucomplete
-"	* YouCompleteMe
 "	* vim-json
 "	* vim-opengrok
 " - Functions
@@ -30,40 +28,28 @@
 " across (heterogeneous) systems easier.
 if has('win32') || has('win64')
 	set runtimepath=$HOME/.vim,$HOME/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
-	"To ensure NERDTree doesn't start in system32 or something
-	"cd $HOME
-	let s:MYVIMFOLDER=$HOME . "/.vim"
-	" Quick access to VIMRC
-	" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
-	let $MYVIMRC=s:MYVIMFOLDER . "/.vimrc"
 	" source $VIMRUNTIME/mswin.vim
 elseif has('unix')
 	set ffs=unix,dos,mac
 	set runtimepath=$HOME/share/.vim,$HOME/share/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/share/.vim/after
-
-	cd $HOME
-	let s:MYVIMFOLDER="$HOME/shared/.vim"
-	
-	" Quick access to VIMRC
-	" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
-	let $MYVIMRC="$HOME/shared/.vim/.vimrc"
 endif
+let s:MYVIMFOLDER=$HOME . "/.vim"
+
+" Quick access to VIMRC
+" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
+let $MYVIMRC=s:MYVIMFOLDER . "/.vimrc"
 
 " Easy pasting to Windows and XWindows systems"
 set clipboard=unnamed
 
-" Setup pathogen"
-"execute pathogen#infect()
-
 call plug#begin('~/.vim/bundle')
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
 
 Plug 'chrisbra/csv.vim'
 Plug 'easymotion/vim-easymotion'
 Plug 'spolu/dwm.vim'
 Plug 'yegappan/mru'
-"Plug 'shougo/neocomplete.vim'
-Plug 'scrooloose/nerdtree'
-Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'w0rp/ale'
 Plug 'majutsushi/tagbar'
 Plug 'tyru/transbuffer.vim'
@@ -80,6 +66,12 @@ Plug 'lifepillar/vim-mucomplete'
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'mhinz/vim-startify'
 Plug 'othree/html5.vim'
+
+"Plug 'prabirshrestha/asyncomplete.vim'
+"Plug 'prabirshrestha/async.vim'
+"Plug 'prabirshrestha/vim-lsp'
+"Plug 'prabirshrestha/asyncomplete-lsp.vim'
+
 Plug 'plasticboy/vim-markdown'
 Plug 'racer-rust/vim-racer'
 Plug 'rhysd/vim-grammarous'
@@ -114,7 +106,7 @@ set cm=blowfish2
 set tabpagemax=100
 set nrformats=alpha,octal,hex
 " Activate syntax highlighting.
-syntax on 
+syntax on
 
 "Allows one to use dir instead of ls on windows
 if has('win32') || has('win64')
@@ -129,9 +121,9 @@ command! Q qall
 set diffopt=filler,vertical
 " 2.) Visual Effects
 " Set a nice theme.
-colorscheme molokai 
+colorscheme molokai
 
-" Column Settings 
+" Column Settings
 " Create a columns on [80]
 let &colorcolumn=120
 highlight ColorColumn ctermbg=8 guibg=DarkGrey
@@ -140,7 +132,7 @@ highlight ColorColumn ctermbg=8 guibg=DarkGrey
 " Always show the tab characters
 set list!
 set listchars=tab:>-
-set tabstop=4 shiftwidth=4 
+set tabstop=4 shiftwidth=4
 
 " Display line and column number in bottom ruler.
 set ruler
@@ -319,7 +311,7 @@ set tags+=~/.vim/tags/*
 
 nnoremap <C-]> <Esc>:exe "ptjump " . expand("<cword>")<Esc>
 "3c.) Tagbar
-noremap  <silent> <special> <F12> :TagbarToggle<RETURN> 
+noremap  <silent> <special> <F12> :TagbarToggle<RETURN>
 noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 
 " 4.) Plugin Settings
@@ -335,11 +327,23 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 	" Enable completion where available.
 	let g:ale_completion_enabled = 0
 
+	"asyncomplete
+	"imap <c-space> <Plug>(asyncomplete_force_refresh)
+	"inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+	"inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+	"inoremap <expr> <cr> pumvisible() ? "\<C-y>\<cr>" : "\<cr>"
+	"autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+
 	"4a.) EasyAlign
 	" Start interactive EasyAlign in visual mode (e.g. vipga)
 	xmap ga <Plug>(EasyAlign)
 	" Start interactive EasyAlign for a motion/text object (e.g. gaip)
 	nmap ga <Plug>(EasyAlign)
+
+	"gutentags"
+	let g:gutentags_cache_dir = s:MYVIMFOLDER . "/plugin_dirs/gutentags/cache"
+	let g:gutentags_define_advanced_commands = 1
+	let g:gutentags_enable = 1
 
 	"4a.) MRU Settings
 	command! Mru MRU
@@ -392,25 +396,30 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 	nmap <silent> zp <Plug>(SpellRotateBackward)
 	vmap <silent> zn <Plug>(SpellRotateForwardV)
 	vmap <silent> zp <Plug>(SpellRotateBackwardV)
- " automatically open and close the popup menu / preview window
- "au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
- "set completeopt=menuone,menu,longest,preview
- 
-	 "gutentags"
-	 let g:gutentags_cache_dir = s:MYVIMFOLDER . "/plugin_dirs/gutentags/cache"
-	 let g:gutentags_define_advanced_commands = 1
-	 let g:gutentags_enable = 1
 
-	"4b.) Vim JDE
-	let g:vjde_completion_key = "<c-space>"
-
-	"4c.) vim-markdown
-	let g:vim_markdown_folding_disabled = 1
+	"vim-jedi"
+	let g:jedi#auto_vim_configuration = 0
+	let g:jedi#auto_initialization = 1
 
 	"vim-json
 	let g:vim_json_syntax_conceal = 0
 
-	
+	"vim-lsp
+	"if executable('pyls')
+		" pip install python-language-server
+	"	au User lsp_setup call lsp#register_server({
+	"		\ 'name': 'pyls',
+	"		\ 'cmd': {server_info->['pyls']},
+	"		\ 'whitelist': ['python'],
+	"		\ })
+	"endif
+
+	"vim-markdown
+	let g:vim_markdown_folding_disabled = 1
+
+	autocmd! FileType Markdown setlocal spell
+	autocmd! FileType Markdown setlocal expandtab
+
 	"vim-mucomplete
 	set completeopt+=menuone
 
@@ -432,17 +441,11 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 	let g:mucomplete#enable_auto_at_startup = 1
 	let g:mucomplete#no_mappings = 1
 	"let g:mucomplete#chains = 0
-	"vim-jedi"
-	let g:jedi#auto_vim_configuration = 0
-	let g:jedi#auto_initialization = 1
-	
+
 	"vim-opengrok"
 	let g:opengrok_jar   = $OPENGROK_HOME . '/lib/opengrok.jar'
 	"let g:opengrok_ctags = 'C:\Users\Ted\Desktop\Utilities\Programming\ctags\ctags.exe'
 	let g:opengrok_config_file = '/var/opengrok/etc/configuration.xml'
 
-	"vim-markdown"
-	autocmd! FileType Markdown setlocal spell
-	autocmd! FileType Markdown setlocal expandtab
 
 " 5.) Functions
