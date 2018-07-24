@@ -17,7 +17,10 @@
 "	* rust-vim
 "	* spellrotate
 "	* startify
+"	* vim-markdown
+"	* vim-markdown-composer
 "	* mucomplete
+"	* vim-airline
 "	* vim-json
 "	* vim-opengrok
 " - Functions
@@ -45,7 +48,6 @@ set clipboard=unnamed
 call plug#begin('~/.vim/bundle')
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
-
 Plug 'chrisbra/csv.vim'
 Plug 'easymotion/vim-easymotion'
 Plug 'spolu/dwm.vim'
@@ -73,6 +75,17 @@ Plug 'othree/html5.vim'
 "Plug 'prabirshrestha/vim-lsp'
 "Plug 'prabirshrestha/asyncomplete-lsp.vim'
 
+function! BuildComposer(info)
+	if a:info.status != 'unchanged' || a:info.force
+		if has('nvim')
+			!cargo build --release
+		else
+			!cargo build --release --no-default-features --features json-rpc
+		endif
+	endif
+endfunction
+
+Plug 'euclio/vim-markdown-composer', { 'do': function('BuildComposer') }
 Plug 'plasticboy/vim-markdown'
 Plug 'racer-rust/vim-racer'
 Plug 'rhysd/vim-grammarous'
@@ -417,6 +430,24 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 	vmap <silent> zn <Plug>(SpellRotateForwardV)
 	vmap <silent> zp <Plug>(SpellRotateBackwardV)
 
+	"vim-airline
+	let g:airline#extensions#ale#enabled = 1
+	let g:airline#extensions#tabline#enabled = 1
+	let g:airline_mode_map = {
+		\ '__' : '-',
+		\ 'n'  : 'NORM',
+		\ 'i'  : 'INS',
+		\ 'R'  : 'REP',
+		\ 'c'  : 'COM',
+		\ 'v'  : 'VIS',
+		\ 'V'  : 'VIS-L',
+		\ '' : 'VIS-B',
+		\ 's'  : 'SEL',
+		\ 'S'  : 'SEL-L',
+		\ '' : 'SEL-B',
+		\ 't' : 'TERM'
+		\ }
+	"let g:airline_section_y = '%f'
 	"vim-jedi"
 	let g:jedi#auto_vim_configuration = 0
 	let g:jedi#auto_initialization = 1
@@ -439,6 +470,8 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 
 	autocmd! FileType Markdown setlocal spell
 	autocmd! FileType Markdown setlocal expandtab
+
+	"vim-markdown-composer
 
 	"vim-mucomplete
 	set completeopt+=menuone
