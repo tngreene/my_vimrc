@@ -53,6 +53,7 @@ Plug 'yegappan/mru'
 Plug 'w0rp/ale'
 Plug 'majutsushi/tagbar'
 Plug 'tyru/transbuffer.vim'
+Plug 'mkitt/tabline.vim'
 " Plug 'beloglazov/vim-online-thesaurus'
 Plug 'adelarsq/vim-matchit'
 Plug 'asenac/vim-opengrok'
@@ -132,7 +133,7 @@ highlight ColorColumn ctermbg=8 guibg=DarkGrey
 " Always show the tab characters
 set list!
 set listchars=tab:>-
-set tabstop=4 shiftwidth=4
+set tabstop=4 shiftwidth=4 expandtab
 
 " Display line and column number in bottom ruler.
 set ruler
@@ -183,8 +184,8 @@ vnoremap : ;
 vnoremap ; :
 
 "Switch between tabs
-nnoremap <silent> <C-Tab> :tabnext<CR>
-nnoremap <silent> <C-S-Tab> :tabprev<CR>
+nnoremap <silent> <C-Tab> :bnext<CR>
+nnoremap <silent> <C-S-Tab> :bprev<CR>
 
 "Replace word under cursor
 nnoremap <leader>rw :.,$s/<C-R><C-W>//gc<Left><Left><Left>
@@ -254,6 +255,11 @@ com! HMS :norm! i<C-R>=strftime("%T")<CR>
 
 "Split current line based on character under cursor
 "nnoremap <A-J> :exe ":.s/" . getline(".")[col(".")-1] . "/" . getline(".")[col(".")-1] . "\r/cg"<CR>
+
+"cd to current file
+nnoremap <silent> <leader>cd :cd %:p:h<CR>:pwd<CR>
+nnoremap <silent> <leader>lcd :lcd %:p:h<CR>:pwd<CR>
+
 """""""""""""""""""""""""""""
 " 3b. C/C++ mappings        "
 """""""""""""""""""""""""""""
@@ -334,6 +340,20 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 	"inoremap <expr> <cr> pumvisible() ? "\<C-y>\<cr>" : "\<cr>"
 	"autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 
+    "dwm.vim
+    let g:dwm_map_keys = 0
+    if !hasmapto('<Plug>DWMFocus')
+        "nmap <C-@> <Plug>DWMFocus
+        nmap <C-Space> <Plug>DWMFocus
+    endif
+
+    if !hasmapto('<Plug>DWMGrowMaster')
+        nmap <C-L> <Plug>DWMGrowMaster
+    endif
+    if !hasmapto('<Plug>DWMShrinkMaster')
+        nmap <C-H> <Plug>DWMShrinkMaster
+    endif
+
 	"4a.) EasyAlign
 	" Start interactive EasyAlign in visual mode (e.g. vipga)
 	xmap ga <Plug>(EasyAlign)
@@ -348,7 +368,7 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 	"4a.) MRU Settings
 	command! Mru MRU
 	let MRU_File = s:MYVIMFOLDER . "/plugin_dirs/MRU/_vim_mru_files"
-	let MRU_Max_Entries = 200
+	let MRU_Max_Entries = 300
 
 	"4a.) NerdTree settings
 	noremap <silent> <F2> :execute 'NERDTreeToggle ' . getcwd()<CR>
@@ -367,7 +387,7 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 		\ "Modified"  : "✹",
 		\ "Staged"    : "✚",
 		\ "Untracked" : "✭",
-		\ "Renamed"   : "➜",
+		\ "Renamed"   : "⇋",
 		\ "Unmerged"  : "═",
 		\ "Deleted"   : "✖",
 		\ "Dirty"     : "✗",
