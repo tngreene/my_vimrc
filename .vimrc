@@ -45,59 +45,66 @@ let $MYVIMRC=s:MYVIMFOLDER . "/.vimrc"
 " Easy pasting to Windows and XWindows systems"
 set clipboard=unnamed
 
+"   * [SS_PLUG]
+" Alphabetical by plugin name over author, whenever possible
 call plug#begin('~/.vim/bundle')
+Plug 'w0rp/ale'
+Plug 'chrisbra/csv.vim'
+Plug 'spolu/dwm.vim'
+Plug 'othree/html5.vim'
+Plug 'davidhalter/jedi-vim'
+Plug 'yegappan/mru'
+
+" Must keep these in this order!
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'chrisbra/csv.vim'
-Plug 'easymotion/vim-easymotion'
-Plug 'spolu/dwm.vim'
-Plug 'yegappan/mru'
-Plug 'w0rp/ale'
+""""""""""""""""""""""""""""""""
+
+Plug 'rust-lang/rust.vim'
+Plug 'tweekmonster/spellrotate.vim'
+Plug 'mkitt/tabline.vim'
 Plug 'majutsushi/tagbar'
 Plug 'tyru/transbuffer.vim'
-Plug 'mkitt/tabline.vim'
-" Plug 'beloglazov/vim-online-thesaurus'
-Plug 'adelarsq/vim-matchit'
-Plug 'asenac/vim-opengrok'
+Plug 'tpope/vim-abolish'
 Plug 'bling/vim-airline'
-Plug 'davidhalter/jedi-vim'
-Plug 'elzr/vim-json'
-Plug 'johngrib/vim-game-code-break'
+Plug 'alvan/vim-closetag'
+Plug 'chrisbra/vim-diff-enhanced'
 Plug 'junegunn/vim-easy-align'
-Plug 'kshenoy/vim-signature'
-Plug 'lifepillar/vim-mucomplete'
+Plug 'easymotion/vim-easymotion'
+Plug 'johngrib/vim-game-code-break'
+Plug 'rhysd/vim-grammarous'
 Plug 'ludovicchabant/vim-gutentags'
+Plug 'elzr/vim-json'
+Plug 'plasticboy/vim-markdown'
+
+function! BuildComposer(info)
+    if a:info.status != 'unchanged' || a:info.force
+        if has('nvim')
+            !cargo build --release
+        else
+            !cargo build --release --no-default-features --features json-rpc
+        endif
+    endif
+endfunction
+
+Plug 'euclio/vim-markdown-composer', { 'do': function('BuildComposer') }
+Plug 'adelarsq/vim-matchit'
+Plug 'lifepillar/vim-mucomplete'
+" Plug 'beloglazov/vim-online-thesaurus'
+Plug 'tngreene/vim-obj8'
+Plug 'asenac/vim-opengrok'
+Plug 'tngreene/vim-quickhelp'
+Plug 'racer-rust/vim-racer'
+Plug 'tpope/vim-repeat'
+Plug 'kshenoy/vim-signature'
 Plug 'mhinz/vim-startify'
-Plug 'othree/html5.vim'
+Plug 'tpope/vim-surround'
+Plug 'triglav/vim-visual-increment'
 
 "Plug 'prabirshrestha/asyncomplete.vim'
 "Plug 'prabirshrestha/async.vim'
 "Plug 'prabirshrestha/vim-lsp'
 "Plug 'prabirshrestha/asyncomplete-lsp.vim'
-
-function! BuildComposer(info)
-	if a:info.status != 'unchanged' || a:info.force
-		if has('nvim')
-			!cargo build --release
-		else
-			!cargo build --release --no-default-features --features json-rpc
-		endif
-	endif
-endfunction
-
-Plug 'euclio/vim-markdown-composer', { 'do': function('BuildComposer') }
-Plug 'plasticboy/vim-markdown'
-Plug 'racer-rust/vim-racer'
-Plug 'rhysd/vim-grammarous'
-Plug 'rust-lang/rust.vim'
-Plug 'tngreene/vim-obj8'
-Plug 'tngreene/vim-quickhelp'
-Plug 'tpope/vim-abolish'
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-surround'
-Plug 'triglav/vim-visual-increment'
-Plug 'tweekmonster/spellrotate.vim'
-
 call plug#end()
 filetype off
 
