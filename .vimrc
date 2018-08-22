@@ -360,6 +360,26 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
 	"inoremap <expr> <cr> pumvisible() ? "\<C-y>\<cr>" : "\<cr>"
 	"autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 
+" - [PL] Plugin Settings
+    "ALE
+    let g:ale_enable = 1
+    let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '⬥ ok']
+    let g:ale_javascript_eslint_use_global = 1
+    let g:ale_linters = {
+                        \'python':['pylint'],
+                        \}
+    "'rust':['rustc']
+
+    " Enable completion where available.
+    let g:ale_completion_enabled = 0
+
+    "asyncomplete
+    "imap <c-space> <Plug>(asyncomplete_force_refresh)
+    "inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+    "inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+    "inoremap <expr> <cr> pumvisible() ? "\<C-y>\<cr>" : "\<cr>"
+    "autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+
     "dwm.vim
     let g:dwm_map_keys = 0
     if !hasmapto('<Plug>DWMFocus')
@@ -374,138 +394,187 @@ noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
         nmap <C-H> <Plug>DWMShrinkMaster
     endif
 
-	"4a.) EasyAlign
-	" Start interactive EasyAlign in visual mode (e.g. vipga)
-	xmap ga <Plug>(EasyAlign)
-	" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-	nmap ga <Plug>(EasyAlign)
+    "gutentags"
+    let g:gutentags_cache_dir = s:MYVIMFOLDER . "/plugin_dirs/gutentags/cache"
+    let g:gutentags_define_advanced_commands = 1
+    let g:gutentags_enable = 1
 
-	"gutentags"
-	let g:gutentags_cache_dir = s:MYVIMFOLDER . "/plugin_dirs/gutentags/cache"
-	let g:gutentags_define_advanced_commands = 1
-	let g:gutentags_enable = 1
+    "jedi-vim
+    "set noshowmode "disable --INSERT--, helps with perforamnce
+    let g:jedi#completions_enabled = 1
 
-	"4a.) MRU Settings
-	command! Mru MRU
-	let MRU_File = s:MYVIMFOLDER . "/plugin_dirs/MRU/_vim_mru_files"
-	let MRU_Max_Entries = 300
+    let g:jedi#popup_on_dot = 1
+    let g:jedi#popup_select_first = 0
+    let g:jedi#use_tabs_not_buffers = 0
 
-	"4a.) NerdTree settings
-	noremap <silent> <F2> :execute 'NERDTreeToggle ' . getcwd()<CR>
-	noremap <silent> <F3> :NERDTreeFind<CR>
+    let g:jedi#auto_vim_configuration = 0
+    let g:jedi#auto_initialization = 1
 
-	let g:NERDTreeWinPos = "left"
-	let g:NERDTreeMapActivateNode="<F3>"
-	let g:NERDTreeMapPreview="<F4>"
-	let g:NERDTreeBookmarksFile=s:MYVIMFOLDER . "/plugin_dirs/NERDTree/.NERDTreeBookmarks"
-	let g:NERDTreeDirArrows=0
-	let g:NERDTreeMouseMode=2
-	let g:NERDTreeShowHidden=1
+    "Jedi Commands
+    let g:jedi#completions_command = "<C-n>"
+    let g:jedi#goto_command = "gd"
+    let g:jedi#documentation_command = "K"
+    let g:jedi#rename_command = "<leader>rn"
+    let g:jedi#usages_command = "<C-G>"
 
-	"NERDTree git plugin
-	let g:NERDTreeIndicatorMapCustom = {
-		\ "Modified"  : "✹",
-		\ "Staged"    : "✚",
-		\ "Untracked" : "✭",
-		\ "Renamed"   : "⇋",
-		\ "Unmerged"  : "═",
-		\ "Deleted"   : "✖",
-		\ "Dirty"     : "✗",
-		\ "Clean"     : "✔︎",
-		\ 'Ignored'   : '☒',
-		\ "Unknown"   : "?"
-		\ }
+    let g:jedi#show_call_signatures = "0"
+    let g:jedi#show_call_signatures_delay = 0
+    call jedi#configure_call_signatures()
 
-	"racer-rust/vim-racer
+    "MRU
+    command! Mru MRU
+    let MRU_File = s:MYVIMFOLDER . "/plugin_dirs/MRU/_vim_mru_files"
+    let MRU_Max_Entries = 300
 
-	"rust-vim
-	let g:rustc_path = $HOME.".cargo/bin/rustc"
-	let g:rustc_makeprg_no_percent = 1
-	let g:rust_conceal = 1
-	let g:rust_conceal_mod_path = 0
-	let g:rust_fold = 1
-	let g:ftplugin_rust_source_path = $RUST_SRC_PATH
+    "NERDTree
+    noremap <silent> <F2> :execute 'NERDTreeToggle ' . getcwd()<CR>
+    noremap <silent> <F3> :NERDTreeFind<CR>
 
-	"let g:rustfmt_autosave = 1
+    let g:NERDTreeWinPos = "left"
+    let g:NERDTreeMapActivateNode="<F3>"
+    let g:NERDTreeMapPreview="<F4>"
+    let g:NERDTreeBookmarksFile=s:MYVIMFOLDER . "/plugin_dirs/NERDTree/.NERDTreeBookmarks"
+    let g:NERDTreeDirArrows=0
+    let g:NERDTreeMouseMode=2
+    let g:NERDTreeShowHidden=1
 
-	"*startify
+    "NERDTree git plugin
+    let g:NERDTreeIndicatorMapCustom = {
+        \ "Modified"  : "✹",
+        \ "Staged"    : "✚",
+        \ "Untracked" : "✭",
+        \ "Renamed"   : "⇋",
+        \ "Unmerged"  : "═",
+        \ "Deleted"   : "✖",
+        \ "Dirty"     : "✗",
+        \ "Clean"     : "✔︎",
+        \ 'Ignored'   : '☒',
+        \ "Unknown"   : "?"
+        \ }
+
+    "racer-rust/vim-racer
+    let g:racer_cmd = ""
+
+    "rust-vim
+    let g:rustc_path = $HOME.".cargo/bin/rustc"
+    let g:rustc_makeprg_no_percent = 1
+    let g:rust_conceal = 0
+    let g:rust_conceal_mod_path = 0
+    let g:rust_fold = 1
+    let g:ftplugin_rust_source_path = $RUST_SRC_PATH
+
+    "let g:rustfmt_autosave = 1
+
+    "*startify
     let g:startify_disable_at_vimenter = 1
 
-	"*spellrotate
-	nmap <silent> zn <Plug>(SpellRotateForward)
-	nmap <silent> zp <Plug>(SpellRotateBackward)
-	vmap <silent> zn <Plug>(SpellRotateForwardV)
-	vmap <silent> zp <Plug>(SpellRotateBackwardV)
+    "*spellrotate
+    nmap <silent> zn <Plug>(SpellRotateForward)
+    nmap <silent> zp <Plug>(SpellRotateBackward)
+    vmap <silent> zn <Plug>(SpellRotateForwardV)
+    vmap <silent> zp <Plug>(SpellRotateBackwardV)
 
-	"vim-airline
-	let g:airline#extensions#ale#enabled = 1
-	let g:airline#extensions#tabline#enabled = 1
-	let g:airline_mode_map = {
-		\ '__' : '-',
-		\ 'n'  : 'NORM',
-		\ 'i'  : 'INS',
-		\ 'R'  : 'REP',
-		\ 'c'  : 'COM',
-		\ 'v'  : 'VIS',
-		\ 'V'  : 'VIS-L',
-		\ '' : 'VIS-B',
-		\ 's'  : 'SEL',
-		\ 'S'  : 'SEL-L',
-		\ '' : 'SEL-B',
-		\ 't' : 'TERM'
-		\ }
-	"let g:airline_section_y = '%f'
-	"vim-jedi"
-	let g:jedi#auto_vim_configuration = 0
-	let g:jedi#auto_initialization = 1
+    "tagbar
+    noremap  <silent> <special> <F12> :TagbarToggle<CR>
+    noremap! <silent> <special> <F12> :TagbarToggle<CR>
 
-	"vim-json
-	let g:vim_json_syntax_conceal = 0
+    "vim-airline
+    let g:airline_highlighting_cache = 1
+    let g:airline#extensions#ale#enabled = 1
+    let g:airline#extensions#tabline#enabled = 1
+    let g:airline_mode_map = {
+        \ '__' : '-',
+        \ 'n'  : 'NORM',
+        \ 'i'  : 'INS',
+        \ 'R'  : 'REP',
+        \ 'c'  : 'COM',
+        \ 'v'  : 'VIS',
+        \ 'V'  : 'VIS-L',
+        \ '' : 'VIS-B',
+        \ 's'  : 'SEL',
+        \ 'S'  : 'SEL-L',
+        \ '' : 'SEL-B',
+        \ 't' : 'TERM'
+        \ }
+    "let g:airline_section_y = '%f'
 
-	"vim-lsp
-	"if executable('pyls')
-		" pip install python-language-server
-	"	au User lsp_setup call lsp#register_server({
-	"		\ 'name': 'pyls',
-	"		\ 'cmd': {server_info->['pyls']},
-	"		\ 'whitelist': ['python'],
-	"		\ })
-	"endif
+    "vim-autopep8"
+    "autocmd FileType python set equalprg=autopep8\ -
 
-	"vim-markdown
-	let g:vim_markdown_folding_disabled = 1
+    "vim-easy-align
+    " Start interactive EasyAlign in visual mode (e.g. vipga)
+    xmap ga <Plug>(EasyAlign)
+    " Start interactive EasyAlign for a motion/text object (e.g. gaip)
+    nmap ga <Plug>(EasyAlign)
 
-	autocmd! FileType Markdown setlocal spell
-	autocmd! FileType Markdown setlocal expandtab
+    "vim-json
+    let g:vim_json_syntax_conceal = 0
 
-	"vim-markdown-composer
+    "vim-lsp
+    "if executable('pyls')
+        " pip install python-language-server
+    "   au User lsp_setup call lsp#register_server({
+    "       \ 'name': 'pyls',
+    "       \ 'cmd': {server_info->['pyls']},
+    "       \ 'whitelist': ['python'],
+    "       \ })
+    "endif
 
-	"vim-mucomplete
-	set completeopt+=menuone
+    "vim-markdown
+    let g:vim_markdown_folding_disabled = 1
 
-	"For automatic completion, you also need to put these in your vimrc:
-	inoremap <expr> <c-e> mucomplete#popup_exit("\<c-e>")
-	inoremap <expr> <c-y> mucomplete#popup_exit("\<c-y>")
-	inoremap <expr>  <cr> mucomplete#popup_exit("\<cr>")
+    autocmd! FileType Markdown setlocal spell
+    autocmd! FileType Markdown setlocal expandtab
 
-	"and at least one of the following (choose the combination that best fits your taste):
-	"set completeopt+=noselect
-	set completeopt+=noinsert
+    "vim-markdown-composer
 
-	"Other recommended settings:
+    "vim-mucomplete
+    set completeopt+=menuone
 
-	set shortmess+=c   " Shut off completion messages
-	set belloff+=ctrlg " If Vim beeps during completion
+    "and at least one of the following (choose the combination that best fits your taste):
+    "set completeopt+=noselect
+    set completeopt+=noinsert
 
-	"No other configuration is needed. Just start pressing <tab> or <s-tab> to complete a word. If you want to enable automatic completion at startup, put
-	let g:mucomplete#enable_auto_at_startup = 1
-	let g:mucomplete#no_mappings = 1
-	"let g:mucomplete#chains = 0
+    "Other recommended settings:
+    set shortmess+=c   " Shut off completion messages
+    "set belloff=all
+    set belloff+=ctrlg " If Vim beeps during completion
 
-	"vim-opengrok"
-	let g:opengrok_jar   = $OPENGROK_HOME . '/lib/opengrok.jar'
-	"let g:opengrok_ctags = 'C:\Users\Ted\Desktop\Utilities\Programming\ctags\ctags.exe'
-	let g:opengrok_config_file = '/var/opengrok/etc/configuration.xml'
+    "No other configuration is needed. Just start pressing <tab> or <s-tab> to complete a word. If you want to enable automatic completion at startup, put
+    let g:mucomplete#enable_auto_at_startup = 0
+    let g:mucomplete#no_mappings = 1
+    "let g:mucomplete#chains = 0
 
+    "vim-opengrok"
+    let g:opengrok_jar   = $OPENGROK_HOME . '/lib/opengrok.jar'
+    "let g:opengrok_ctags = 'C:\Users\Ted\Desktop\Utilities\Programming\ctags\ctags.exe'
+    let g:opengrok_config_file = '/var/opengrok/etc/configuration.xml'
+
+    nnoremap <leader>re :g/addon\|Smart/normal dd<CR>
+
+    "vim-signature
+    let g:SignatureMap = {
+        \ 'Leader'             :  "m",
+        \ 'PlaceNextMark'      :  "m,",
+        \ 'ToggleMarkAtLine'   :  "m.",
+        \ 'PurgeMarksAtLine'   :  "m-",
+        \ 'DeleteMark'         :  "dm",
+        \ 'PurgeMarks'         :  "m<Space>",
+        \ 'PurgeMarkers'       :  "m<BS>",
+        \ 'GotoNextLineAlpha'  :  "']",
+        \ 'GotoPrevLineAlpha'  :  "'[",
+        \ 'GotoNextSpotAlpha'  :  "`]",
+        \ 'GotoPrevSpotAlpha'  :  "`[",
+        \ 'GotoNextLineByPos'  :  "]'",
+        \ 'GotoPrevLineByPos'  :  "['",
+        \ 'GotoNextSpotByPos'  :  "]`",
+        \ 'GotoPrevSpotByPos'  :  "[`",
+        \ 'GotoNextMarker'     :  "]-",
+        \ 'GotoPrevMarker'     :  "[-",
+        \ 'GotoNextMarkerAny'  :  "]=",
+        \ 'GotoPrevMarkerAny'  :  "[=",
+        \ 'ListBufferMarks'    :  "m/",
+        \ 'ListBufferMarkers'  :  "m?"
+        \ }
 
 " 5.) Functions
