@@ -4,8 +4,6 @@ tags/cpp_src
 *.out
 *_vim_mru_files
 .netrwhist
-.swap/*
 plugin_dirs/gutentags/cache/*
 plugin_dirs/NERDTree/.NERDTreeBookmarks
 tags/tags.temp
-.backup/*
