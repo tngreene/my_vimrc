@@ -8,3 +8,4 @@ tags/cpp_src
 plugin_dirs/gutentags/cache/*
 plugin_dirs/NERDTree/.NERDTreeBookmarks
 tags/tags.temp
+.backup/*

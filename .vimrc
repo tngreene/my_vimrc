@@ -1,46 +1,61 @@
+""""""""""""""""""""""""""
+" Ted's Very Cool vimrc "
+""""""""""""""""""""""""""
+" Assumes you have a version controlled .vim in %USERPROFILE%,
+" using a small _vimrc to source this one. You should also use a Huge build with Python 3
+" Use # on [BRACKETS] to jump to that section
 " TOC
-" - System Setup
-"	* OS Settings
-"	* Gobal Settings
-"	* File Types
-"	* vimdiff Settings
+" - [SS] System Setup
+"   * [SS_OS] OS/File System Settings
+"   * [SS_PLUG] call plug#begin('~/.vim/bundle')
+"   * Gobal Settings
+"   * [SS_FT] File Type Settings
+"   * [SS_SS] Session Options
+"   * vimdiff Settings
 " - Visual Effects
 " - Keyboard Re-mappings
-" - Plugin Settings
-"	* ALE
-"	* EasyAlign
-"	* EasyMotion
-"	* MRU
-"	* NERDTree
-"		> Main Settings
-"		> git-plugin
-"	* rust-vim
-"	* spellrotate
-"	* startify
-"	* vim-markdown
-"	* vim-markdown-composer
-"	* mucomplete
-"	* vim-airline
-"	* vim-json
-"	* vim-opengrok
-" - Functions
+" - [PL] Plugin Settings
+"   * ALE
+"   * EasyAlign
+"   * EasyMotion
+"   * jedi-vim
+"   * MRU
+"   * NERDTree
+"       > Main Settings
+"       > git-plugin
+"   * rust-vim
+"   * spellrotate
+"   * startify
+"   * vim-markdown
+"   * vim-markdown-composer
+"   * vim-mucomplete
+"   * vim-airline
+"   * vim-json
+"   * vim-opengrok
+" Style Guide
+" - Use <CR>, not <Enter> or <Return>
+" - Everything should be as alphabetical as possible or match the order listed in the plugin's help
 
-" - System setup
-"	* OS Settings
+" - [SS] System Setup
+"   * [SS_OS] OS/File System Settings
 " On Windows, also use '.vim' instead of 'vimfiles'; this makes synchronization
 " across (heterogeneous) systems easier.
-if has('win32') || has('win64')
-	set runtimepath=$HOME/.vim,$HOME/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
-	" source $VIMRUNTIME/mswin.vim
-elseif has('unix')
-	set ffs=unix,dos,mac
-	set runtimepath=$HOME/share/.vim,$HOME/share/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/share/.vim/after
-endif
-let s:MYVIMFOLDER=$HOME . "/.vim"
 
-" Quick access to VIMRC
-" Set $MYVIMRC to point to this file. Note: This may be a bad idea.
-let $MYVIMRC=s:MYVIMFOLDER . "/.vimrc"
+if has('win32') || has('win64')
+    set runtimepath=$HOME/.vim,$HOME/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+    let s:MYVIMFOLDER=$HOME . "/.vim"
+    "Allows one to use dir instead of ls on windows
+    command! -bar Dir !dir
+elseif has('unix')
+    "This is from a very specific way of mounting %USER_PROFILE% as "share"
+    set runtimepath=$HOME/share/.vim,$HOME/share/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/share/.vim/after
+    let s:MYVIMFOLDER=$HOME . "/share/.vim"
+endif
+let $MYVIMRC  =s:MYVIMFOLDER . "/.vimrc"
+let &backupdir=s:MYVIMFOLDER . '/.backup//'
+let &directory  =s:MYVIMFOLDER . '/.swap//'
+let sessionsdir =s:MYVIMFOLDER . '/sessions//'
+let &undodir  =s:MYVIMFOLDER . '/.undo//'
 
 " Easy pasting to Windows and XWindows systems"
 set clipboard=unnamed
@@ -55,6 +70,7 @@ Plug 'othree/html5.vim'
 Plug 'davidhalter/jedi-vim'
 Plug 'yegappan/mru'
 
+""""""""""""""""""""""""""""""""
 " Must keep these in this order!
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
@@ -106,7 +122,6 @@ Plug 'triglav/vim-visual-increment'
 "Plug 'prabirshrestha/vim-lsp'
 "Plug 'prabirshrestha/asyncomplete-lsp.vim'
 call plug#end()
-filetype off
 
 "Set commandline history length
 set history=700
@@ -114,14 +129,10 @@ set history=700
 "Stop showing "Press ENTER or type command to continue"
 set cmdheight=2
 
-filetype plugin indent on
-
 set fileformat=unix
 set fileformats=unix,dos
 set encoding=utf-8
-let &backupdir=s:MYVIMFOLDER . '/.backup//'
-let &directory=s:MYVIMFOLDER . '/.swap//'
-let &undodir  =s:MYVIMFOLDER . '/.undo//'
+
 
 set cm=blowfish2
 set tabpagemax=100
@@ -129,17 +140,43 @@ set nrformats=alpha,octal,hex
 " Activate syntax highlighting.
 syntax on
 
-"Allows one to use dir instead of ls on windows
-if has('win32') || has('win64')
-	command! -bar Dir !dir
-endif
 
 command! Q qall
-" 1.c File Type Settings
+" [SS_FT] File Type Settings
+" Plugins may provide further customization for file types
+filetype plugin indent on
+
+" 2. File Type Settings
+augroup VimRCFileTypeCmds
+    autocmd!
+    "C++
+    "Swap between .cpp and .h
+    autocmd VimRCFileTypeCmds FileType cpp nnoremap <buffer> <F4> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+    "markdown
+    autocmd VimRCFileTypeCmds FileType markdown setlocal spell
+augroup END
+
+" C++
+
+" Markdown
+
+" Python
+
+" Rust
+
+" viml
+
+" [SS_SS] Session Options
+set sessionoptions+=slash,unix
+set sessionoptions-=options
 
 " 1.c vimdiff Settings
 "
 set diffopt=filler,vertical
+
+" Buffer Settings
+command! BufOnly silent! execute "%bd|e#|bd#"
+
 " 2.) Visual Effects
 " Set a nice theme.
 colorscheme molokai
@@ -171,6 +208,8 @@ endif
 " Fold settings
 set foldmethod=marker
 
+
+
 " 3. Keyboard changes
 "
 """""""""""""""""""""""""""""
@@ -183,6 +222,9 @@ let maplocalleader = "\\"
 
 " Change backspace behavior
 set backspace=indent,eol,start
+
+" Disable quitting all with ZQ
+nnoremap ZQ :bdelete!<CR>
 
 " Disable going into Ex mode
 nnoremap Q <nop>
@@ -213,6 +255,7 @@ nnoremap <leader>rw :.,$s/<C-R><C-W>//gc<Left><Left><Left>
 "Replace WORD under cursor
 nnoremap <leader>rW :.,$s/<C-R><C-A>//gc<Left><Left><Left>
 
+nnoremap <leader>py Oimport sys;sys.path.append(r'C:\Users\Ted\.p2\pool\plugins\org.python.pydev.core_6.5.0.201809011628\pysrc')<cr>import pydevd;pydevd.settrace()<esc>
 " Thanks bryankennedy's vimrc!
 " https://github.com/bryankennedy/vimrc/blob/master/vimrc
 " Escape special characters in a string for exact matching.
@@ -284,8 +327,6 @@ nnoremap <silent> <leader>lcd :lcd %:p:h<CR>:pwd<CR>
 " 3b. C/C++ mappings        "
 """""""""""""""""""""""""""""
 
-"Swap between .cpp and .h
-nnoremap <F4> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
 
 """""""""""""""""""""""""""""
 " 3c. Normal mode changes   "
@@ -309,9 +350,9 @@ inoremap kj <esc>
 inoremap <C-v> <C-r>+
 "Press esc to automatically close a help window
 augroup quickhelpexit
-	au!
-	autocmd FileType help nnoremap <buffer> <esc> :q<CR>
-	autocmd BufLeave help nunmap <buffer> <esc>
+    au!
+    autocmd FileType help nnoremap <buffer> <esc> :q<CR>
+    autocmd BufLeave help nunmap <buffer> <esc>
 augroup END
 
 " Open a new line without entering insert mode
@@ -336,29 +377,6 @@ set tags+=~/.vim/tags/*
 " map <C-F12> :!ctags -R --sort=yes --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
 
 nnoremap <C-]> <Esc>:exe "ptjump " . expand("<cword>")<Esc>
-"3c.) Tagbar
-noremap  <silent> <special> <F12> :TagbarToggle<RETURN>
-noremap! <silent> <special> <F12> :TagbarToggle<RETURN>
-
-" 4.) Plugin Settings
-	"ALE
-	let g:ale_enable = 1
-	let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '⬥ ok']
-	let g:ale_javascript_eslint_use_global = 1
-	let g:ale_linters = {
-						\'python':['pylint'],
-						\'rust':['rustc']
-						\}
-
-	" Enable completion where available.
-	let g:ale_completion_enabled = 0
-
-	"asyncomplete
-	"imap <c-space> <Plug>(asyncomplete_force_refresh)
-	"inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-	"inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-	"inoremap <expr> <cr> pumvisible() ? "\<C-y>\<cr>" : "\<cr>"
-	"autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 
 " - [PL] Plugin Settings
     "ALE
