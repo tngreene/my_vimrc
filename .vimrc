@@ -418,6 +418,9 @@ nnoremap <C-]> <Esc>:exe "ptjump " . expand("<cword>")<Esc>
     let g:gutentags_enable = 1
 
     "jedi-vim
+    " Bug fix from https://github.com/davidhalter/jedi-vim/issues/870#issuecomment-413937942
+    py3 import os; import sys; sys.executable=os.path.join(sys.prefix, 'python.exe')
+
     "set noshowmode "disable --INSERT--, helps with perforamnce
     let g:jedi#completions_enabled = 1
 
