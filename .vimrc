@@ -8,12 +8,15 @@
 " - [SS] System Setup
 "   * [SS_OS] OS/File System Settings
 "   * [SS_PLUG] call plug#begin('~/.vim/bundle')
-"   * Gobal Settings
+"   * [SS_GLOBAL] Default Options (same order as :options)
 "   * [SS_FT] File Type Settings
 "   * [SS_SS] Session Options
-"   * vimdiff Settings
-" - Visual Effects
-" - Keyboard Re-mappings
+" - [FUN] Functions
+" - [COM] Commands
+" - [MAP] Keyboard Mappings
+"   * nnoremap
+" - * vnoremap
+" - [VIS] Visual Effects
 " - [PL] Plugin Settings
 "   * ALE
 "   * EasyAlign
@@ -32,8 +35,11 @@
 "   * vim-airline
 "   * vim-json
 "   * vim-opengrok
+"   * vim-signature
+"   * yapf
 " Style Guide
-" - Use <CR>, not <Enter> or <Return>
+" - Use key notation from doct\intro.txt *keycodes*:
+"       Use <CR>, not <Enter> or <Return>, <Up>, not <up>, <C-H>, not <Ctrl-H>
 " - Everything should be as alphabetical as possible or match the order listed in the plugin's help
 
 " - [SS] System Setup
@@ -64,10 +70,11 @@ set clipboard=unnamed
 " Alphabetical by plugin name over author, whenever possible
 call plug#begin('~/.vim/bundle')
 Plug 'w0rp/ale'
+Plug 'rafi/awesome-vim-colorschemes'
 Plug 'chrisbra/csv.vim'
 Plug 'spolu/dwm.vim'
 Plug 'othree/html5.vim'
-Plug 'davidhalter/jedi-vim'
+Plug 'davidhalter/jedi-vim' ", { 'tag':'0.9.0'}
 Plug 'yegappan/mru'
 
 """"""""""""""""""""""""""""""""
@@ -75,7 +82,6 @@ Plug 'yegappan/mru'
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 """"""""""""""""""""""""""""""""
-
 Plug 'rust-lang/rust.vim'
 Plug 'tweekmonster/spellrotate.vim'
 Plug 'mkitt/tabline.vim'
@@ -116,12 +122,16 @@ Plug 'kshenoy/vim-signature'
 Plug 'mhinz/vim-startify'
 Plug 'tpope/vim-surround'
 Plug 'triglav/vim-visual-increment'
-
+Plug 'google/yapf', { 'rtp': 'plugins/vim', 'for': 'python' }
 "Plug 'prabirshrestha/asyncomplete.vim'
 "Plug 'prabirshrestha/async.vim'
 "Plug 'prabirshrestha/vim-lsp'
 "Plug 'prabirshrestha/asyncomplete-lsp.vim'
 call plug#end()
+
+" * [SS_GLOBAL]
+"   * 1 important
+set pastetoggle="<F11>"
 
 "Set commandline history length
 set history=700
@@ -129,31 +139,76 @@ set history=700
 "Stop showing "Press ENTER or type command to continue"
 set cmdheight=2
 
+" * 3 tags
+set tags+=~/.vim/tags/*
+
+"   * 4 displaying text
+set list!
+set listchars=tab:>-
+set number
+
+"   * 5 syntax, highlighting, and spelling
+set colorcolumn=120
+
+"   * 7 multiple tab pages
+set tabpagemax=100
+
+"   * 10 GUI
+if has("gui_running")
+  " Set a nicer font.
+  set guifont=Consolas:h11:cDEFAULT
+  " Hide the toolbar.
+  set guioptions-=T
+endif
+
+"   * 12 messages and info
+set ruler
+
+"   * 14 editing text
+set backspace=indent,eol,start
+set nrformats=alpha,octal,hex
+
+"   * 15 tabs and indenting
+set tabstop=4 shiftwidth=4 expandtab
+
+"   * 16 folding
+set foldmethod=marker
+
+"   * 17 diff options
+set diffopt=filler,vertical
+
+"   * 19 reading and writing files
 set fileformat=unix
 set fileformats=unix,dos
+set cm=blowfish2
+
+"   * 26 multi-byte characters
 set encoding=utf-8
 
-
-set cm=blowfish2
-set tabpagemax=100
-set nrformats=alpha,octal,hex
-" Activate syntax highlighting.
-syntax on
-
+"   * various
+set sessionoptions+=slash,unix
+set sessionoptions-=options
 
 command! Q qall
+
 " [SS_FT] File Type Settings
 " Plugins may provide further customization for file types
 filetype plugin indent on
 
-" 2. File Type Settings
 augroup VimRCFileTypeCmds
     autocmd!
+    " Stop that annoying auto comment insertion
+    autocmd VimRCFileTypeCmds FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
     "C++
     "Swap between .cpp and .h
     autocmd VimRCFileTypeCmds FileType cpp nnoremap <buffer> <F4> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
     "markdown
     autocmd VimRCFileTypeCmds FileType markdown setlocal spell
+    "python
+    autocmd VimRCFileTypeCmds FileType python nnoremap <leader>= :.,.YAPF<cr>
+    "the '< and '> get filled in automatically
+    autocmd VimRCFileTypeCmds FileType python vnoremap <leader>= :YAPF<cr>
+
 augroup END
 
 " C++
@@ -166,62 +221,17 @@ augroup END
 
 " viml
 
-" [SS_SS] Session Options
-set sessionoptions+=slash,unix
-set sessionoptions-=options
-
-" 1.c vimdiff Settings
-"
-set diffopt=filler,vertical
-
-" Buffer Settings
-command! BufOnly silent! execute "%bd|e#|bd#"
-
-" 2.) Visual Effects
-" Set a nice theme.
-colorscheme molokai
-
-" Column Settings
-" Create a columns on [80]
-let &colorcolumn=120
-highlight ColorColumn ctermbg=8 guibg=DarkGrey
-
-" Tab setting
-" Always show the tab characters
-set list!
-set listchars=tab:>-
-set tabstop=4 shiftwidth=4 expandtab
-
-" Display line and column number in bottom ruler.
-set ruler
-
-" Display the line numbers.
-set number
-
-if has("gui_running")
-  " Set a nicer font.
-  set guifont=Consolas:h11:cDEFAULT
-  " Hide the toolbar.
-  set guioptions-=T
-endif
-
-" Fold settings
-set foldmethod=marker
-
-
-
-" 3. Keyboard changes
-"
-"""""""""""""""""""""""""""""
-" 3a. Global, all the time  "
-"""""""""""""""""""""""""""""
-
+" [FUN] Functions
+" [COM] Commands
+" [MAP] Keyboard Mappings
 " Explicitly set the mapleader(s)
 let mapleader = "\\"
 let maplocalleader = "\\"
 
-" Change backspace behavior
-set backspace=indent,eol,start
+nnoremap <leader>. :<up><CR>
+
+" Buffer Settings
+command! BufOnly silent! execute "%bd|e#|bd#"
 
 " Disable quitting all with ZQ
 nnoremap ZQ :bdelete!<CR>
@@ -255,7 +265,7 @@ nnoremap <leader>rw :.,$s/<C-R><C-W>//gc<Left><Left><Left>
 "Replace WORD under cursor
 nnoremap <leader>rW :.,$s/<C-R><C-A>//gc<Left><Left><Left>
 
-nnoremap <leader>py Oimport sys;sys.path.append(r'C:\Users\Ted\.p2\pool\plugins\org.python.pydev.core_6.5.0.201809011628\pysrc')<cr>import pydevd;pydevd.settrace()<esc>
+nnoremap <leader>py Oimport sys;sys.path.append(r'C:\Users\Ted\.p2\pool\plugins\org.python.pydev.core_7.0.3.201811082356\pysrc')<cr>import pydevd;pydevd.settrace()<esc>
 " Thanks bryankennedy's vimrc!
 " https://github.com/bryankennedy/vimrc/blob/master/vimrc
 " Escape special characters in a string for exact matching.
@@ -359,8 +369,6 @@ augroup END
 nnoremap <A-o> o<esc>
 nnoremap <A-O> O<esc>
 
-" Stop that annoying auto comment insertion
-autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
 " Disable the arrow keys so you can be a super professional vim user
 noremap <Left>  <NOP>
@@ -372,13 +380,18 @@ noremap <Down>  <NOP>
 " General Tags Settings
 """"""""""""""""""""""""""""""""
 " configure tags - add additional tags here or comment out not-used ones
-set tags+=~/.vim/tags/*
 " build tags of your own project with Ctrl-F12
 " map <C-F12> :!ctags -R --sort=yes --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
 
 nnoremap <C-]> <Esc>:exe "ptjump " . expand("<cword>")<Esc>
 
-" - [PL] Plugin Settings
+" [VIS] Visual Effects
+syntax on
+colorscheme molokai
+
+highlight ColorColumn ctermbg=8 guibg=DarkGrey
+
+" [PL] Plugin Settings
     "ALE
     let g:ale_enable = 1
     let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '⬥ ok']
@@ -390,6 +403,13 @@ nnoremap <C-]> <Esc>:exe "ptjump " . expand("<cword>")<Esc>
 
     " Enable completion where available.
     let g:ale_completion_enabled = 0
+
+    "python
+    let g:ale_fixers = {
+    \   'python': [
+    \   'trim_whitespace',
+    \   ]
+    \}
 
     "asyncomplete
     "imap <c-space> <Plug>(asyncomplete_force_refresh)
@@ -438,8 +458,8 @@ nnoremap <C-]> <Esc>:exe "ptjump " . expand("<cword>")<Esc>
     let g:jedi#rename_command = "<leader>rn"
     let g:jedi#usages_command = "<C-G>"
 
-    let g:jedi#show_call_signatures = "0"
-    let g:jedi#show_call_signatures_delay = 0
+    let g:jedi#show_call_signatures = 1
+    let g:jedi#show_call_signatures_delay = 500
     call jedi#configure_call_signatures()
 
     "MRU
@@ -597,5 +617,7 @@ nnoremap <C-]> <Esc>:exe "ptjump " . expand("<cword>")<Esc>
         \ 'ListBufferMarks'    :  "m/",
         \ 'ListBufferMarkers'  :  "m?"
         \ }
+
+    " yapf
 
 " 5.) Functions
