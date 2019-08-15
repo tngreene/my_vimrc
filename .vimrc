@@ -13,12 +13,13 @@
 "   * [SS_SS] Session Options
 " - [FUN] Functions
 " - [COM] Commands
-" - [MAP] Keyboard Mappings
-"   * nnoremap
-" - * vnoremap
+" - [MAP] Keyboard Mappings (as best grouped as possible)
+"   * [MAP_N] nnoremappings
+"   * [MAP_V] vnoremappings
 " - [VIS] Visual Effects
 " - [PL] Plugin Settings
 "   * ALE
+"   * CtrlP
 "   * EasyAlign
 "   * EasyMotion
 "   * jedi-vim
@@ -26,6 +27,7 @@
 "   * NERDTree
 "       > Main Settings
 "       > git-plugin
+"   * netrw
 "   * rust-vim
 "   * spellrotate
 "   * startify
@@ -57,11 +59,12 @@ elseif has('unix')
     set runtimepath=$HOME/share/.vim,$HOME/share/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/share/.vim/after
     let s:MYVIMFOLDER=$HOME . "/share/.vim"
 endif
-let $MYVIMRC  =s:MYVIMFOLDER . "/.vimrc"
-let &backupdir=s:MYVIMFOLDER . '/.backup//'
-let &directory  =s:MYVIMFOLDER . '/.swap//'
-let sessionsdir =s:MYVIMFOLDER . '/sessions//'
-let &undodir  =s:MYVIMFOLDER . '/.undo//'
+let $MYVIMRC    =s:MYVIMFOLDER . "/.vimrc"
+let &backupdir  =s:MYVIMFOLDER . "/.backup//"
+let &directory  =s:MYVIMFOLDER . "/.swap//"
+let s:plugindirs  =s:MYVIMFOLDER . "/plugin_dirs/"
+let s:sessionsdir =s:MYVIMFOLDER . "/sessions//"
+let &undodir    =s:MYVIMFOLDER . "/.undo//"
 
 " Easy pasting to Windows and XWindows systems"
 set clipboard=unnamed
@@ -72,7 +75,7 @@ call plug#begin('~/.vim/bundle')
 Plug 'w0rp/ale'
 Plug 'rafi/awesome-vim-colorschemes'
 Plug 'chrisbra/csv.vim'
-Plug 'spolu/dwm.vim'
+Plug 'ctrlpvim/ctrlp.vim'
 Plug 'othree/html5.vim'
 Plug 'davidhalter/jedi-vim' ", { 'tag':'0.9.0'}
 Plug 'yegappan/mru'
@@ -93,7 +96,6 @@ Plug 'alvan/vim-closetag'
 Plug 'chrisbra/vim-diff-enhanced'
 Plug 'junegunn/vim-easy-align'
 Plug 'easymotion/vim-easymotion'
-Plug 'johngrib/vim-game-code-break'
 Plug 'rhysd/vim-grammarous'
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'elzr/vim-json'
@@ -109,7 +111,7 @@ function! BuildComposer(info)
     endif
 endfunction
 
-Plug 'euclio/vim-markdown-composer', { 'do': function('BuildComposer') }
+"Plug 'euclio/vim-markdown-composer', { 'do': function('BuildComposer') }
 Plug 'adelarsq/vim-matchit'
 Plug 'lifepillar/vim-mucomplete'
 " Plug 'beloglazov/vim-online-thesaurus'
@@ -119,7 +121,6 @@ Plug 'tngreene/vim-quickhelp'
 Plug 'racer-rust/vim-racer'
 Plug 'tpope/vim-repeat'
 Plug 'kshenoy/vim-signature'
-Plug 'mhinz/vim-startify'
 Plug 'tpope/vim-surround'
 Plug 'triglav/vim-visual-increment'
 Plug 'google/yapf', { 'rtp': 'plugins/vim', 'for': 'python' }
@@ -150,6 +151,9 @@ set number
 "   * 5 syntax, highlighting, and spelling
 set colorcolumn=120
 
+"   * 6 multiple windows
+set hidden
+
 "   * 7 multiple tab pages
 set tabpagemax=100
 
@@ -176,13 +180,27 @@ set foldmethod=marker
 
 "   * 17 diff options
 set diffopt=filler,vertical
+set diffexpr=MyDiff()
+function! MyDiff()
+   let opt = " "
+   if &diffopt =~ "icase"
+     let opt = opt . "-i "
+   endif
+   if &diffopt =~ "iwhite"
+     let opt = opt . "-b "
+   endif
+   silent execute "!\"C:/Vim/diff.exe\" -a --binary" . opt . v:fname_in . " " . v:fname_new .  " > " . v:fname_out
+endfunction
 
 "   * 19 reading and writing files
 set fileformat=unix
 set fileformats=unix,dos
 set cm=blowfish2
 
-"   * 26 multi-byte characters
+"   * 21 wildignore
+set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
+set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows"   * 26 multi-byte characters
+
 set encoding=utf-8
 
 "   * various
@@ -265,7 +283,7 @@ nnoremap <leader>rw :.,$s/<C-R><C-W>//gc<Left><Left><Left>
 "Replace WORD under cursor
 nnoremap <leader>rW :.,$s/<C-R><C-A>//gc<Left><Left><Left>
 
-nnoremap <leader>py Oimport sys;sys.path.append(r'C:\Users\Ted\.p2\pool\plugins\org.python.pydev.core_7.0.3.201811082356\pysrc')<cr>import pydevd;pydevd.settrace()<esc>
+nnoremap <leader>py Oimport sys;sys.path.append(r'C:\Users\Ted\.p2\pool\plugins\org.python.pydev.core_7.2.1.201904261721\pysrc')<cr>import pydevd;pydevd.settrace()<esc>
 " Thanks bryankennedy's vimrc!
 " https://github.com/bryankennedy/vimrc/blob/master/vimrc
 " Escape special characters in a string for exact matching.
@@ -346,7 +364,7 @@ nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 nnoremap <leader>sv :w<cr>:source $MYVIMRC<cr>
 nnoremap <special><C-W><C-Q> <C-W><C-C>
 
-nnoremap dd "_dd
+"nnoremap dd "_dd
 
 """"""""""""""""""""""""""""
 " 3c. Insert mode changes  "
@@ -396,20 +414,26 @@ highlight ColorColumn ctermbg=8 guibg=DarkGrey
     let g:ale_enable = 1
     let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '⬥ ok']
     let g:ale_javascript_eslint_use_global = 1
-    let g:ale_linters = {
-                        \'python':['pylint'],
-                        \}
+    let b:py_linters = ['pylint'] ", 'mypy']
+    let g:ale_linters = {'python':b:py_linters}
     "'rust':['rustc']
 
     " Enable completion where available.
     let g:ale_completion_enabled = 0
+    let g:ale_fix_on_save = 1
+    let g:ale_lint_on_save = 1
+    let g:ale_lint_on_text_changed = 1
 
-    "python
+    "ale-python
     let g:ale_fixers = {
     \   'python': [
-    \   'trim_whitespace',
+    \       'trim_whitespace',
     \   ]
     \}
+
+    let g:ale_python_pylint_options = "-E"
+    let g:ale_python_mypy_options = "--ignore-missing-imports"
+
 
     "asyncomplete
     "imap <c-space> <Plug>(asyncomplete_force_refresh)
@@ -418,29 +442,20 @@ highlight ColorColumn ctermbg=8 guibg=DarkGrey
     "inoremap <expr> <cr> pumvisible() ? "\<C-y>\<cr>" : "\<cr>"
     "autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 
-    "dwm.vim
-    let g:dwm_map_keys = 0
-    if !hasmapto('<Plug>DWMFocus')
-        "nmap <C-@> <Plug>DWMFocus
-        nmap <C-Space> <Plug>DWMFocus
-    endif
+    "ctrlp"
+    let g:ctrlp_custom_ignore = {
+        \ 'dir':  '\v[\/]\.(git|hg|svn)$',
+        \ 'file': '\v\.(exe|so|dll)$',
+        \ }
+    let g:ctrlp_working_path_mode = "rwa"
 
-    if !hasmapto('<Plug>DWMGrowMaster')
-        nmap <C-L> <Plug>DWMGrowMaster
-    endif
-    if !hasmapto('<Plug>DWMShrinkMaster')
-        nmap <C-H> <Plug>DWMShrinkMaster
-    endif
 
     "gutentags"
-    let g:gutentags_cache_dir = s:MYVIMFOLDER . "/plugin_dirs/gutentags/cache"
+    let g:gutentags_cache_dir = s:plugindirs . "gutentags/cache"
     let g:gutentags_define_advanced_commands = 1
     let g:gutentags_enable = 1
 
     "jedi-vim
-    " Bug fix from https://github.com/davidhalter/jedi-vim/issues/870#issuecomment-413937942
-    py3 import os; import sys; sys.executable=os.path.join(sys.prefix, 'python.exe')
-
     "set noshowmode "disable --INSERT--, helps with perforamnce
     let g:jedi#completions_enabled = 1
 
@@ -464,7 +479,7 @@ highlight ColorColumn ctermbg=8 guibg=DarkGrey
 
     "MRU
     command! Mru MRU
-    let MRU_File = s:MYVIMFOLDER . "/plugin_dirs/MRU/_vim_mru_files"
+    let MRU_File = s:plugindirs . "MRU/_vim_mru_files"
     let MRU_Max_Entries = 300
 
     "NERDTree
@@ -474,10 +489,11 @@ highlight ColorColumn ctermbg=8 guibg=DarkGrey
     let g:NERDTreeWinPos = "left"
     let g:NERDTreeMapActivateNode="<F3>"
     let g:NERDTreeMapPreview="<F4>"
-    let g:NERDTreeBookmarksFile=s:MYVIMFOLDER . "/plugin_dirs/NERDTree/.NERDTreeBookmarks"
+    let g:NERDTreeBookmarksFile=s:plugindirs . "NERDTree/.NERDTreeBookmarks"
     let g:NERDTreeDirArrows=0
     let g:NERDTreeMouseMode=2
     let g:NERDTreeShowHidden=1
+    let g:NERDTreeHijackNetrw=0
 
     "NERDTree git plugin
     let g:NERDTreeIndicatorMapCustom = {
@@ -493,6 +509,16 @@ highlight ColorColumn ctermbg=8 guibg=DarkGrey
         \ "Unknown"   : "?"
         \ }
 
+    "netrw
+    let g:netrw_banner = 0
+    let g:netrw_browse_split = 0
+    let g:netrw_home = s:plugindirs . "netrw"
+    let g:netrw_list_hide = '\(^\|\s\s\)\zs\.\S\+,\(^\|\s\s\)ntuser\.\S\+'
+    let g:netrw_liststyle = 3
+    let g:netrw_winsize = 25
+    autocmd FileType netrw set nolist
+    autocmd FileType netrw setl bufhidden=delete
+
     "racer-rust/vim-racer
     let g:racer_cmd = ""
 
@@ -506,8 +532,6 @@ highlight ColorColumn ctermbg=8 guibg=DarkGrey
 
     "let g:rustfmt_autosave = 1
 
-    "*startify
-    let g:startify_disable_at_vimenter = 1
 
     "*spellrotate
     nmap <silent> zn <Plug>(SpellRotateForward)
