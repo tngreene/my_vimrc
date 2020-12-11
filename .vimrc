@@ -59,12 +59,18 @@ elseif has('unix')
     set runtimepath=$HOME/share/.vim,$HOME/share/.vim/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/share/.vim/after
     let s:MYVIMFOLDER=$HOME . "/share/.vim"
 endif
-let $MYVIMRC    =s:MYVIMFOLDER . "/.vimrc"
-let &backupdir  =s:MYVIMFOLDER . "/.backup//"
-let &directory  =s:MYVIMFOLDER . "/.swap//"
-let s:plugindirs  =s:MYVIMFOLDER . "/plugin_dirs/"
-let s:sessionsdir =s:MYVIMFOLDER . "/sessions//"
-let &undodir    =s:MYVIMFOLDER . "/.undo//"
+
+cd ~
+let &pythonthreedll = $HOME . "/utils/programming/Python38/python38.dll"
+let $MYVIMRC =      s:MYVIMFOLDER . "/.vimrc"
+
+"idk, stick it here
+let $PYTHONPATH = $PYTHONPATH . ";C:/Users/Ted/XPlaneForExporter/tests"
+let &backupdir =    s:MYVIMFOLDER . "/.backup//"
+let &directory =    s:MYVIMFOLDER . "/.swap//"
+let s:plugindirs  = s:MYVIMFOLDER . "/plugin_dirs/"
+let s:sessionsdir = s:MYVIMFOLDER . "/sessions//"
+let &undodir =      s:MYVIMFOLDER . "/.undo//"
 
 " Easy pasting to Windows and XWindows systems"
 set clipboard=unnamed
@@ -74,10 +80,12 @@ set clipboard=unnamed
 call plug#begin('~/.vim/bundle')
 Plug 'w0rp/ale'
 Plug 'rafi/awesome-vim-colorschemes'
+Plug 'psf/black', {'tag': '19.10b0'}
+Plug 'metakirby5/codi.vim'
 Plug 'chrisbra/csv.vim'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'othree/html5.vim'
-Plug 'davidhalter/jedi-vim' ", { 'tag':'0.9.0'}
+Plug 'davidhalter/jedi-vim'
 Plug 'yegappan/mru'
 
 """"""""""""""""""""""""""""""""
@@ -123,7 +131,6 @@ Plug 'tpope/vim-repeat'
 Plug 'kshenoy/vim-signature'
 Plug 'tpope/vim-surround'
 Plug 'triglav/vim-visual-increment'
-Plug 'google/yapf', { 'rtp': 'plugins/vim', 'for': 'python' }
 "Plug 'prabirshrestha/asyncomplete.vim'
 "Plug 'prabirshrestha/async.vim'
 "Plug 'prabirshrestha/vim-lsp'
@@ -199,9 +206,13 @@ set cm=blowfish2
 
 "   * 21 wildignore
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
-set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows"   * 26 multi-byte characters
+set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows"
+set wildignore+=*.blend*
+set wildignore+=*.pyc
 
+"   * 26 multi-byte characters
 set encoding=utf-8
+scriptencoding utf-8
 
 "   * various
 set sessionoptions+=slash,unix
@@ -223,9 +234,8 @@ augroup VimRCFileTypeCmds
     "markdown
     autocmd VimRCFileTypeCmds FileType markdown setlocal spell
     "python
-    autocmd VimRCFileTypeCmds FileType python nnoremap <leader>= :.,.YAPF<cr>
-    "the '< and '> get filled in automatically
-    autocmd VimRCFileTypeCmds FileType python vnoremap <leader>= :YAPF<cr>
+    autocmd VimRCFileTypeCmds FileType python nnoremap <leader>vg :vimgrep "" **/*.py<C-left><C-left><right>
+    "autocmd VimRCFileTypeCmds FileType python inoremap """ """<enter>"""<C-O>O
 
 augroup END
 
@@ -234,6 +244,7 @@ augroup END
 " Markdown
 
 " Python
+" autocmd BufWritePre *.py execute ':Black'
 
 " Rust
 
@@ -245,6 +256,9 @@ augroup END
 " Explicitly set the mapleader(s)
 let mapleader = "\\"
 let maplocalleader = "\\"
+
+nnoremap * #
+nnoremap # *
 
 nnoremap <leader>. :<up><CR>
 
@@ -274,6 +288,30 @@ vnoremap : ;
 vnoremap ; :
 
 "Switch between tabs
+function! NextThing()
+    if split(execute('args'), "\n") == []
+        bnext
+    else
+        if argidx() == argc() - 1
+            rewind
+        else
+            next
+        endif
+    endif
+endfunction
+
+function! PrevThing()
+    if split(execute('args'), "\n") == []
+        bprev
+    else
+        if argidx() == 0
+            last
+        else
+            prev
+        endif
+    endif
+endfunction
+
 nnoremap <silent> <C-Tab> :bnext<CR>
 nnoremap <silent> <C-S-Tab> :bprev<CR>
 
@@ -283,7 +321,8 @@ nnoremap <leader>rw :.,$s/<C-R><C-W>//gc<Left><Left><Left>
 "Replace WORD under cursor
 nnoremap <leader>rW :.,$s/<C-R><C-A>//gc<Left><Left><Left>
 
-nnoremap <leader>py Oimport sys;sys.path.append(r'C:\Users\Ted\.p2\pool\plugins\org.python.pydev.core_7.2.1.201904261721\pysrc')<cr>import pydevd;pydevd.settrace()<esc>
+nnoremap <leader>py Obreakpoint()<esc>
+"nnoremap <leader>py Oimport sys;sys.path.append(r'C:\Users\Ted\.p2\pool\plugins\org.python.pydev.core_7.5.0.202001101138\pysrc')<cr>import pydevd;pydevd.settrace()<esc>
 " Thanks bryankennedy's vimrc!
 " https://github.com/bryankennedy/vimrc/blob/master/vimrc
 " Escape special characters in a string for exact matching.
@@ -405,7 +444,7 @@ nnoremap <C-]> <Esc>:exe "ptjump " . expand("<cword>")<Esc>
 
 " [VIS] Visual Effects
 syntax on
-colorscheme molokai
+colorscheme OceanicNext
 
 highlight ColorColumn ctermbg=8 guibg=DarkGrey
 
@@ -414,7 +453,7 @@ highlight ColorColumn ctermbg=8 guibg=DarkGrey
     let g:ale_enable = 1
     let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '⬥ ok']
     let g:ale_javascript_eslint_use_global = 1
-    let b:py_linters = ['pylint'] ", 'mypy']
+    let b:py_linters = ['pylint', ] ", 'mypy']
     let g:ale_linters = {'python':b:py_linters}
     "'rust':['rustc']
 
@@ -430,6 +469,7 @@ highlight ColorColumn ctermbg=8 guibg=DarkGrey
     \       'trim_whitespace',
     \   ]
     \}
+    "\       'isort',
 
     let g:ale_python_pylint_options = "-E"
     let g:ale_python_mypy_options = "--ignore-missing-imports"
@@ -441,6 +481,9 @@ highlight ColorColumn ctermbg=8 guibg=DarkGrey
     "inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
     "inoremap <expr> <cr> pumvisible() ? "\<C-y>\<cr>" : "\<cr>"
     "autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+
+    "black
+
 
     "ctrlp"
     let g:ctrlp_custom_ignore = {
@@ -491,12 +534,13 @@ highlight ColorColumn ctermbg=8 guibg=DarkGrey
     let g:NERDTreeMapPreview="<F4>"
     let g:NERDTreeBookmarksFile=s:plugindirs . "NERDTree/.NERDTreeBookmarks"
     let g:NERDTreeDirArrows=0
+    let g:NERDTreeIgnore=['\.blend[1-9]*']
     let g:NERDTreeMouseMode=2
     let g:NERDTreeShowHidden=1
     let g:NERDTreeHijackNetrw=0
 
     "NERDTree git plugin
-    let g:NERDTreeIndicatorMapCustom = {
+    let g:NERDTreeGitStatusIndicatorMapCustom  = {
         \ "Modified"  : "✹",
         \ "Staged"    : "✚",
         \ "Untracked" : "✭",
